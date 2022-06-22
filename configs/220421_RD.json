@@ -1,0 +1,8 @@
+{
+    "sheet_of_interest": "R&ID indications",
+    "clinical_indication_column_code": "Test ID",
+    "clinical_indication_column_name": "Clinical Indication",
+    "panel_column": "Target/Genes",
+    "test_method_column": "Test Method",
+    "header_index": 1
+}
