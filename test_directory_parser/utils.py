@@ -1,6 +1,7 @@
 import datetime
 
 import pandas as pd
+import regex
 
 
 def get_date():
@@ -19,3 +20,12 @@ def parse_tsv(tsv):
     data = pd.read_csv(tsv, delimiter="\t")
     noned_data = data.where(pd.notnull(data), None)
     return noned_data
+
+
+def match_target(pattern, targets):
+    match = regex.match(pattern, targets)
+
+    if match:
+        return True
+    else:
+        return False
