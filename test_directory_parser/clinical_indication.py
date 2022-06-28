@@ -1,21 +1,20 @@
-import regex
-
 from test_directory_parser import utils
 
 
 class ClinicalIndication:
-    def __init__(self, r_code, name, panels, test_method):
+    def __init__(self, r_code, name, panels, test_method, hgnc_dump):
         self.r_code = r_code
         self.name = name
-        self.panels = panels
+        self.original_targets = panels
+        self.panels = None
         self.test_method = test_method
-        self.clean_panels()
+        self.clean_panels(hgnc_dump)
 
-    def clean_panels(self):
+    def clean_panels(self, hgnc_dump):
         # stupid weird dash that needs replacing
-        self.panels = self.panels.replace("–", "-")
-        panels_comma = [p.strip() for p in self.panels.split(",")]
-        panels_semicolon = [p.strip() for p in self.panels.split(";")]
+        panels = self.original_targets.replace("–", "-")
+        panels_comma = [p.strip() for p in panels.split(",")]
+        panels_semicolon = [p.strip() for p in panels.split(";")]
 
         if panels_comma == panels_semicolon:
             # regex to identify panelapp panels
@@ -27,16 +26,13 @@ class ClinicalIndication:
 
             # regex to identify gene symbol
             if utils.match_target(r"[A-Z]+[A-Z0-9]+", panels_comma[0]):
-                self.panels = panels_comma
+                hgnc_id = utils.find_hgnc_id(panels_comma[0], hgnc_dump)
+                self.panels = [hgnc_id]
                 return
 
             # regex to identify the rest
             if utils.match_target(r"[A-Za-z\ ]", panels_comma[0]):
-                print(panels_comma)
-                self.panels = panels_comma
                 return
-
-            print(panels_comma)
 
         else:
             if len(panels_comma) == 1:
@@ -52,18 +48,13 @@ class ClinicalIndication:
                     # print("assume lists of gene semicolon", panels_comma)
 
             elif len(panels_comma) >= 2:
-                # check if the list only contains genes
-                # check that the first element has a gene structure i.e. it's
-                # not something weird
-                if utils.match_target(r"[A-Z]+[A-Z0-9]+", panels_comma[0]):
-                    # gene
-                    for panel in panels_comma:
-                        if utils.match_target(r"[A-Z]+[A-Z0-9]+", panel):
-                            pass
-                else:
-                    # some panelapp panels have commas
-                    self.panels = ", ".join(panels_comma)
-                    return
+                cleaned_panels = utils.handle_list_panels(
+                    panels_comma, hgnc_dump
+                )
+
+                if cleaned_panels:
+                    self.panels = cleaned_panels
+                return
 
             if len(panels_semicolon) == 1:
                 # try and rescue some panelapp panels
@@ -78,4 +69,10 @@ class ClinicalIndication:
                     pass
 
             elif len(panels_semicolon) >= 2:
-                pass
+                cleaned_panels = utils.handle_list_panels(
+                    panels_semicolon, hgnc_dump
+                )
+
+                if cleaned_panels:
+                    self.panels = cleaned_panels
+                return
