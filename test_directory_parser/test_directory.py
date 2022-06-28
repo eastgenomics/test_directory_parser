@@ -2,11 +2,12 @@ from test_directory_parser import clinical_indication
 
 
 class TestDirectory:
-    def __init__(self, dataframe, config, td_type):
+    def __init__(self, dataframe, config, td_type, hgnc_dump):
         self.data = dataframe.to_dict()
         self.type = td_type
         self.config = config
         self.clinical_indications = []
+        self.hgnc_dump = hgnc_dump
 
     def setup_clinical_indications(self):
         r_codes = self.data[
@@ -29,6 +30,6 @@ class TestDirectory:
 
             self.clinical_indications.append(
                 clinical_indication.ClinicalIndication(
-                    r_code, ci, panel, test_method
+                    r_code, ci, panel, test_method, self.hgnc_dump
                 )
             )
