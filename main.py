@@ -21,7 +21,7 @@ def main(args):
             args.test_directory, config_data
         )
         rd_test_directory = test_directory.TestDirectory(
-            sheet, config_data, "rare_disease"
+            sheet, config_data, "rare_disease", hgnc_data
         )
         rd_test_directory.setup_clinical_indications()
     elif cmd == "cancer":
