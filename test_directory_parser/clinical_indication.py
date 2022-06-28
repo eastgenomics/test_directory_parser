@@ -27,7 +27,10 @@ class ClinicalIndication:
             # regex to identify gene symbol
             if utils.match_target(r"[A-Z]+[A-Z0-9]+", panels_comma[0]):
                 hgnc_id = utils.find_hgnc_id(panels_comma[0], hgnc_dump)
-                self.panels = [hgnc_id]
+
+                if hgnc_id:
+                    self.panels = [hgnc_id]
+
                 return
 
             # regex to identify the rest
