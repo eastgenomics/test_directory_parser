@@ -107,15 +107,18 @@ def handle_list_panels(panels, hgnc_dump):
                         gene.strip() for gene in panel.split("and")
                     ]
 
-                    # check if there were 2 genes from each side of the and
+                    # check if there were 2 genes from each side of the 'and'
                     if len(attempt_rescue_gene) >= 2:
-                        rescued_gene = find_hgnc_id(panel, hgnc_dump)
-                        if rescued_gene:
-                            hgnc_ids.extend(rescued_gene)
-            else:
-                # some panelapp panels have commas
-                return ", ".join(panels)
+                        for gene in attempt_rescue_gene:
+                            rescued_gene = find_hgnc_id(gene, hgnc_dump)
+
+                            if rescued_gene:
+                                hgnc_ids.append(rescued_gene)
 
         return hgnc_ids
     else:
+        # some panelapp panels have commas
+        if match_target(r"[A-Za-z0-9-()\ ,]*\([0-9&\ ]+\)", ", ".join(panels)):
+            return [", ".join(panels)]
+
         return None
