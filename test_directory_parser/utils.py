@@ -3,7 +3,6 @@ import datetime
 import numpy as np
 import pandas as pd
 import regex
-from termcolor import cprint
 
 
 def get_date():
@@ -25,6 +24,19 @@ def parse_tsv(tsv):
 
 
 def find_hgnc_id(gene_symbol, hgnc_dump):
+    """ Find hgnc id using the hgnc dump
+
+    Args:
+        gene_symbol (str): Gene symbol
+        hgnc_dump (pd.Dataframe): Hgnc dump dataframe
+
+    Raises:
+        Exception: if a panel has escaped previous checks
+
+    Returns:
+        str: Hgnc id
+    """
+
     # pattern is the gene symbol and only the gene symbol
     pattern = fr"^{gene_symbol}$"
     # try and match the gene symbol in the Approved symbol column
@@ -79,8 +91,18 @@ def find_hgnc_id(gene_symbol, hgnc_dump):
         return [hgnc_id for hgnc_id in data][0]
 
 
-def match_target(pattern, targets):
-    match = regex.match(pattern, targets)
+def match_target(pattern, target):
+    """ Regex match pattern to the target
+
+    Args:
+        pattern (regex str): Pattern to match to the target
+        target (str): Target
+
+    Returns:
+        bool: if pattern matched
+    """
+
+    match = regex.match(pattern, target)
 
     if match:
         return True
@@ -89,6 +111,16 @@ def match_target(pattern, targets):
 
 
 def handle_list_panels(panels, hgnc_dump):
+    """ Given a list of "panels", get the hgnc ids/rescue comma panelapp panels
+
+    Args:
+        panels (list): List of panels
+        hgnc_dump (pd.Dataframe): Hgnc dump dataframe
+
+    Returns:
+        list: List of hgnc ids/panel
+    """
+
     hgnc_ids = []
 
     # check if the list only contains genes
