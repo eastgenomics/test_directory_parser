@@ -1,7 +1,7 @@
 # test_directory_parser
 Script(s) to parse the test directories
 
-## Beforehand
+## Before running the code
 
 ### HGNC dump
 
