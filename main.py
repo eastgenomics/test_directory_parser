@@ -24,10 +24,12 @@ def main(args):
             sheet, config_data, "rare_disease", hgnc_data
         )
         rd_test_directory.setup_clinical_indications()
+        rd_test_directory.output()
+
     elif cmd == "cancer":
-        pass
+        print("Parsing of the cancer test directory is not implemented yet")
     else:
-        raise Exception("?")
+        raise Exception(f"'{cmd}' is not a valid option")
 
 
 if __name__ == "__main__":
