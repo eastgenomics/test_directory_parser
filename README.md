@@ -5,7 +5,7 @@ Script(s) to parse the test directories
 
 ### HGNC dump
 
-To generate the HGNC dump, you can go there: https://www.genenames.org/download/custom/
+To generate the HGNC dump, you can go to: https://www.genenames.org/download/custom/
 
 And for the code to work, the following checkboxes need to be checked:
 
@@ -28,6 +28,8 @@ HGNC:10000	RGS4	SCZD9
 ### Test directory
 
 The rare disease and cancer test directories are downloadable here: https://www.england.nhs.uk/publication/national-genomic-test-directories/
+
+Right now this version of the code can only be used to parse the rare disease test directory.
 
 ### Config file
 
