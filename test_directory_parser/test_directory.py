@@ -10,6 +10,8 @@ class TestDirectory:
         self.hgnc_dump = hgnc_dump
 
     def setup_clinical_indications(self):
+        """ Setup the clinical indications """
+
         r_codes = self.data[
             self.config["clinical_indication_column_code"]
         ]
@@ -33,3 +35,23 @@ class TestDirectory:
                     r_code, ci, panel, test_method, self.hgnc_dump
                 )
             )
+
+    def output(self):
+        """ Output for every clinical indication in the test methods of
+        interest: r_code, name, test_method, original targets and cleaned
+        targets
+        """
+
+        with open("cleaned_test_directory.tsv", "w") as f:
+            for ci in self.clinical_indications:
+                if ci.test_method in self.config["ngs_test_methods"]:
+                    if ci.panels is None:
+                        f.write(
+                            f"{ci.r_code}\t{ci.name}\t{ci.test_method}\t"
+                            f"{ci.original_targets}\t{ci.panels}\n"
+                        )
+                    else:
+                        f.write(
+                            f"{ci.r_code}\t{ci.name}\t{ci.test_method}\t"
+                            f"{ci.original_targets}\t{'|'.join(ci.panels)}\n"
+                        )
