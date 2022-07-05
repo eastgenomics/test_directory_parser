@@ -61,7 +61,7 @@ The `ngs_test_methods` field contains the test methods that we want to keep, so 
 ## How to run
 
 ```bash
-source ../../envs/test_directory_parser/bin/activate
+source envs/test_directory_parser/bin/activate
 
 python main.py --hgnc ${hgnc_dump.txt} rare_disease ${test_directory.xlsx} configs/220421_RD.json
 ```
