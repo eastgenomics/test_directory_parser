@@ -11,6 +11,12 @@ class ClinicalIndication:
         self.clean_panels(hgnc_dump)
 
     def clean_panels(self, hgnc_dump):
+        """ Attempt to clean up the targets in the excel file
+
+        Args:
+            hgnc_dump (pandas.Dataframe): Dataframe of hgnc data
+        """
+
         # stupid weird dash that needs replacing
         panels = self.original_targets.replace("–", "-")
         panels_comma = [p.strip() for p in panels.split(",")]
