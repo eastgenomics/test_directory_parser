@@ -14,6 +14,17 @@ And for the code to work, the following checkboxes need to be checked:
 - Alias symbols
 - Previous symbols
 
+Example:
+
+```tsv
+HGNC ID	Approved symbol	Previous symbols	Alias symbols
+HGNC:1	A12M1		
+HGNC:10	A2MRAP		
+HGNC:100	ASIC1	ACCN2	BNaC2, hBNaC2
+HGNC:1000	BCL5		
+HGNC:10000	RGS4	SCZD9	
+```
+
 ### Test directory
 
 The rare disease and cancer test directories are downloadable here: https://www.england.nhs.uk/publication/national-genomic-test-directories/
