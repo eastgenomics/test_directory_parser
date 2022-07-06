@@ -16,9 +16,9 @@ def get_date():
 
 
 def parse_tsv(tsv):
-    data = pd.read_csv(tsv, delimiter="\t")
-    noned_data = data.where(pd.notnull(data), None)
-    return noned_data
+    df = pd.read_csv(tsv, delimiter="\t")
+    df_with_none = df.where(pd.notnull(df), None)
+    return df_with_none
 
 
 def find_hgnc_id(gene_symbol, hgnc_dump):
@@ -74,13 +74,20 @@ def find_hgnc_id(gene_symbol, hgnc_dump):
 
             # check the size of the dataframes and do the appropriate action
             if len(df_previous_symbols) == 0 and len(df_alias_symbols) == 0:
+                # couldn't find a previous or alias symbol
                 return None
             elif len(df_previous_symbols) == 1 and len(df_alias_symbols) == 0:
+                # found only a previous symbol, return the HGNC id
                 return df_previous_symbols["HGNC ID"].to_list()[0]
             elif len(df_previous_symbols) == 0 and len(df_alias_symbols) == 1:
+                # found only a alias symbol, return the HGNC id
                 return df_alias_symbols["HGNC ID"].to_list()[0]
             elif len(df_previous_symbols) >= 1 and len(df_alias_symbols) >= 1:
-                pass
+                # found previous and alias symbols, cry
+                print(
+                    "Couldn't find a non umbiguous HGNC id for "
+                    f"'{gene_symbol}'"
+                )
 
         # some panel escaped checks
         else:
