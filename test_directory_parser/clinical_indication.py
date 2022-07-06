@@ -1,3 +1,5 @@
+import regex
+
 from test_directory_parser import utils
 
 
@@ -24,14 +26,14 @@ class ClinicalIndication:
 
         if panels_comma == panels_semicolon:
             # regex to identify panelapp panels
-            if utils.match_target(
+            if regex.match(
                 r"[A-Za-z0-9-()\ ]*\([0-9&\ ]+\)", panels_comma[0]
             ):
                 self.panels = panels_comma
                 return
 
             # regex to identify gene symbol
-            if utils.match_target(r"[A-Z]+[A-Z0-9]+", panels_comma[0]):
+            if regex.match(r"[A-Z]+[A-Z0-9]+", panels_comma[0]):
                 hgnc_id = utils.find_hgnc_id(panels_comma[0], hgnc_dump)
 
                 if hgnc_id:
@@ -40,13 +42,13 @@ class ClinicalIndication:
                 return
 
             # regex to identify the rest
-            if utils.match_target(r"[A-Za-z\ ]", panels_comma[0]):
+            if regex.match(r"[A-Za-z\ ]", panels_comma[0]):
                 return
 
         else:
             if len(panels_comma) == 1:
                 # try and rescue some panelapp panels
-                if utils.match_target(
+                if regex.match(
                     r"[A-Za-z0-9-()\ ,]*\([0-9]+\)", panels_comma[0]
                 ):
                     self.panels = panels_comma
@@ -67,7 +69,7 @@ class ClinicalIndication:
 
             if len(panels_semicolon) == 1:
                 # try and rescue some panelapp panels
-                if utils.match_target(
+                if regex.match(
                     r"[A-Za-z0-9-()\ ,]*\([0-9]+\)", panels_semicolon[0]
                 ):
                     self.panels = panels_semicolon
