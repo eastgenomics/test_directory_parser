@@ -17,6 +17,7 @@ def get_date():
 
 def parse_tsv(tsv):
     df = pd.read_csv(tsv, delimiter="\t")
+    # replace NA by None so that we can handle them
     df_with_none = df.where(pd.notnull(df), None)
     return df_with_none
 
@@ -93,7 +94,7 @@ def find_hgnc_id(gene_symbol, hgnc_dump):
         else:
             raise Exception(f"'{gene_symbol}' escaped checks")
     else:
-        return [hgnc_id for hgnc_id in data][0]
+        return data.iloc[0]
 
 
 def handle_list_panels(panels, hgnc_dump, r_code):
