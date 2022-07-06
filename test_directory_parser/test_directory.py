@@ -47,7 +47,7 @@ class TestDirectory:
             {
                 "name": ci.name, "code": ci.r_code,
                 "gemini_name": f"{ci.r_code}_{ci.name}_P",
-                "panels": ci.panels
+                "panels": ci.panels, "original_targets": ci.original_targets
             }
             for ci in self.clinical_indications
         ]
