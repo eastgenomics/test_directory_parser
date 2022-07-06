@@ -13,7 +13,7 @@ def main(args):
             output = args.output
         else:
             date = utils.get_date()
-            output = f"{date}_RD_TD_output"
+            output = f"{date}_RD_TD.json"
 
         hgnc_data = utils.parse_tsv(args.hgnc)
         config_data = rare_disease.parse_config(args.config)
@@ -24,7 +24,7 @@ def main(args):
             sheet, config_data, "rare_disease", hgnc_data
         )
         rd_test_directory.setup_clinical_indications()
-        rd_test_directory.output()
+        rd_test_directory.output_json(output)
 
     elif cmd == "cancer":
         print("Parsing of the cancer test directory is not implemented yet")
