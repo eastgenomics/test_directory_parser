@@ -60,7 +60,7 @@ class ClinicalIndication:
 
             elif len(panels_comma) >= 2:
                 cleaned_panels = utils.handle_list_panels(
-                    panels_comma, hgnc_dump
+                    panels_comma, hgnc_dump, self.r_code
                 )
 
                 if cleaned_panels:
@@ -81,7 +81,7 @@ class ClinicalIndication:
 
             elif len(panels_semicolon) >= 2:
                 cleaned_panels = utils.handle_list_panels(
-                    panels_semicolon, hgnc_dump
+                    panels_semicolon, hgnc_dump, self.r_code
                 )
 
                 if cleaned_panels:
