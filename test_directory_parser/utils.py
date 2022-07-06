@@ -96,12 +96,13 @@ def find_hgnc_id(gene_symbol, hgnc_dump):
         return [hgnc_id for hgnc_id in data][0]
 
 
-def handle_list_panels(panels, hgnc_dump):
+def handle_list_panels(panels, hgnc_dump, r_code):
     """ Given a list of "panels", get the hgnc ids/rescue comma panelapp panels
 
     Args:
         panels (list): List of panels
         hgnc_dump (pd.Dataframe): Hgnc dump dataframe
+        r_code (str): R code
 
     Returns:
         list: List of hgnc ids/panel
@@ -150,8 +151,22 @@ def handle_list_panels(panels, hgnc_dump):
 
         return hgnc_ids
     else:
-        # some panelapp panels have commas
-        if regex.match(r"[A-Za-z0-9-()\ ,]*\([0-9&\ ]+\)", ", ".join(panels)):
-            return [", ".join(panels)]
+        # do regex to see if every element in the list is a panel
+        matches = [
+            regex.match(r"[A-Za-z0-9-()\ ,]*\([0-9&\ ]+\)", panel)
+            for panel in panels
+        ]
 
-        return None
+        if all(matches):
+            # all the elements are panelapp panels
+            return panels
+        else:
+            # working on it, i realised that trying to rescue the potential 
+            # panelapp panels is not trivial at all i.e. what if the panel has
+            # multiple commas
+            # so i think it's safer to manual rescue them
+            print(
+                f"'{r_code}' has the following potential panelapp panels "
+                f"with commas '{panels}'"
+            )
+            return None
