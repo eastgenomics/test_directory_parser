@@ -1,4 +1,7 @@
+import json
+
 from test_directory_parser import clinical_indication
+from test_directory_parser import utils
 
 
 class TestDirectory:
@@ -36,22 +39,22 @@ class TestDirectory:
                 )
             )
 
-    def output(self):
-        """ Output for every clinical indication in the test methods of
-        interest: r_code, name, test_method, original targets and cleaned
-        targets
-        """
+    def output_json(self, output):
+        source = self.config["name"]
+        date = utils.get_date()
 
-        with open("cleaned_test_directory.tsv", "w") as f:
-            for ci in self.clinical_indications:
-                if ci.test_method in self.config["ngs_test_methods"]:
-                    if ci.panels is None:
-                        f.write(
-                            f"{ci.r_code}\t{ci.name}\t{ci.test_method}\t"
-                            f"{ci.original_targets}\t{ci.panels}\n"
-                        )
-                    else:
-                        f.write(
-                            f"{ci.r_code}\t{ci.name}\t{ci.test_method}\t"
-                            f"{ci.original_targets}\t{'|'.join(ci.panels)}\n"
-                        )
+        indications = [
+            {
+                "name": ci.name, "code": ci.r_code,
+                "gemini_name": f"{ci.r_code}_{ci.name}_P",
+                "panels": ci.panels
+            }
+            for ci in self.clinical_indications
+        ]
+
+        data = {
+            "source": source, "date": date, "indications": indications
+        }
+
+        with open(output, "w") as f:
+            json.dump(data, f, indent=2)
