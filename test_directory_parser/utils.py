@@ -113,14 +113,19 @@ def handle_list_panels(panels, hgnc_dump):
     # check that the first element has a gene structure i.e. it's
     # not something weird
     if regex.match(r"[A-Z]+[A-Z0-9]+", panels[0]):
-        # we are dealing with genes
+        # first element is a gene, so assume that we're dealing with genes
         for panel in panels:
+            # for every element in the list, double check that it is a gene
+            # because of test directory unpredictableness
             if regex.match(r"[A-Z]+[A-Z0-9]+", panel):
                 hgnc_id = find_hgnc_id(panel, hgnc_dump)
 
                 if hgnc_id:
                     hgnc_ids.append(hgnc_id)
                 else:
+                    # there are instances where the targets can include "and"
+                    # at the end of a gene list.
+                    # try and catch those instances
                     if "and" in panel:
                         attempt_rescue_gene = [
                             gene.strip() for gene in panel.split("and")
@@ -136,7 +141,12 @@ def handle_list_panels(panels, hgnc_dump):
                                 else:
                                     hgnc_ids.append(None)
                     else:
+                        # we didn't manage to find a HGNC id for the gene
+                        # symbol
                         hgnc_ids.append(None)
+            else:
+                # that element of the list is not a gene
+                hgnc_ids.append(None)
 
         return hgnc_ids
     else:
