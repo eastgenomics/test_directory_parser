@@ -85,7 +85,7 @@ def find_hgnc_id(gene_symbol, hgnc_dump):
             elif len(df_previous_symbols) >= 1 and len(df_alias_symbols) >= 1:
                 # found previous and alias symbols, cry
                 print(
-                    "Couldn't find a non umbiguous HGNC id for "
+                    "Couldn't find a non ambiguous HGNC id for "
                     f"'{gene_symbol}'"
                 )
 
