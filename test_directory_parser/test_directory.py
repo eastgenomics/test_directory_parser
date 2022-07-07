@@ -9,7 +9,8 @@ class TestDirectory:
         self.data = dataframe.to_dict()
         self.type = td_type
         self.config = config
-        self.clinical_indications = []
+        self.all_clinical_indications = []
+        self.ngs_clinical_indications = []
         self.hgnc_dump = hgnc_dump
 
     def setup_clinical_indications(self):
@@ -33,23 +34,29 @@ class TestDirectory:
             panel = panels[index]
             test_method = test_methods[index]
 
-            self.clinical_indications.append(
-                clinical_indication.ClinicalIndication(
-                    r_code, ci, panel, test_method, self.hgnc_dump
-                )
+            ci = clinical_indication.ClinicalIndication(
+                r_code, ci, panel, test_method, self.hgnc_dump
             )
+
+            # handled clinical indications by the lab and that will be stored
+            # in panel palace
+            if test_method in self.config["ngs_test_methods"]:
+                self.ngs_clinical_indications.append(ci)
+
+            self.all_clinical_indications.append(ci)
 
     def output_json(self, output):
         source = self.config["name"]
         date = utils.get_date()
 
+        # we only output clinical indications that the lab will handle
         indications = [
             {
                 "name": ci.name, "code": ci.r_code,
-                "gemini_name": f"{ci.r_code}_{ci.name}_P",
+                "gemini_name": ci.gemini_name, "test_method": ci.test_method,
                 "panels": ci.panels, "original_targets": ci.original_targets
             }
-            for ci in self.clinical_indications
+            for ci in self.ngs_clinical_indications
         ]
 
         data = {
