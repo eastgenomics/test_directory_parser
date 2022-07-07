@@ -36,7 +36,7 @@ class ClinicalIndication:
             if regex.match(
                 r"[A-Za-z0-9-()\ ]*\([0-9&\ ]+\)", panels_comma[0]
             ):
-                self.panels = panels_comma
+                self.panels = utils.extract_panelapp_id(panels_comma)
                 return
 
             # regex to identify gene symbol
@@ -58,7 +58,7 @@ class ClinicalIndication:
                 if regex.match(
                     r"[A-Za-z0-9-()\ ,]*\([0-9]+\)", panels_comma[0]
                 ):
-                    self.panels = panels_comma
+                    self.panels = utils.extract_panelapp_id(panels_comma)
                     return
                 else:
                     # assume that we have lists of genes using semicolon
@@ -79,7 +79,7 @@ class ClinicalIndication:
                 if regex.match(
                     r"[A-Za-z0-9-()\ ,]*\([0-9]+\)", panels_semicolon[0]
                 ):
-                    self.panels = panels_semicolon
+                    self.panels = utils.extract_panelapp_id(panels_semicolon)
                     return
                 else:
                     # assume that we have lists of genes not using comma
