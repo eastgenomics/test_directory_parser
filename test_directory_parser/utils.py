@@ -186,12 +186,16 @@ def extract_panelapp_id(panels):
     panelapp_ids = []
 
     for panel in panels:
+        # find the panelapp id in the panel name
         match = regex.search(r"\([0-9]+\)", panel)
 
         if match:
+            # get the whole result and strip out the parentheses
             result = match.group(0).strip("()")
             panelapp_ids.append(result)
         else:
+            # it might be something like "(panelapp id & panelapp id)", true
+            # story
             match = regex.search(r"\([0-9& ]+\)", panel)
 
             if match:
