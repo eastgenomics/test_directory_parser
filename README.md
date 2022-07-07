@@ -7,7 +7,7 @@ Script(s) to parse the test directories
 
 To generate the HGNC dump, you can go to: https://www.genenames.org/download/custom/
 
-And for the code to work, the following checkboxes need to be checked:
+And for the code to work, the following checkboxes need to be checked when you download the dump:
 
 - HGNC ID
 - Approved symbol
@@ -41,6 +41,7 @@ The `ngs_test_methods` field contains the test methods that we want to keep, so 
 
 ```json
 {
+    "name": "220421_RD",
     "sheet_of_interest": "R&ID indications",
     "clinical_indication_column_code": "Test ID",
     "clinical_indication_column_name": "Clinical Indication",
