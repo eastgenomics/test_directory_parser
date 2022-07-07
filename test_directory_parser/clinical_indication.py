@@ -6,7 +6,14 @@ from test_directory_parser import utils
 class ClinicalIndication:
     def __init__(self, r_code, name, panels, test_method, hgnc_dump):
         self.r_code = r_code
-        self.name = name
+        # R424 has a space at the end of its name
+        self.name = name.strip()
+
+        if "gene" in test_method:
+            self.gemini_name = f"{self.r_code}_{self.name}_G"
+        else:
+            self.gemini_name = f"{self.r_code}_{self.name}_P"
+
         self.original_targets = panels
         self.panels = None
         self.test_method = test_method
