@@ -160,9 +160,9 @@ def handle_list_panels(panels, hgnc_dump, r_code):
 
         if all(matches):
             # all the elements are panelapp panels
-            return panels
+            return extract_panelapp_id(panels)
         else:
-            # working on it, i realised that trying to rescue the potential 
+            # working on it, i realised that trying to rescue the potential
             # panelapp panels is not trivial at all i.e. what if the panel has
             # multiple commas
             # so i think it's safer to manual rescue them
@@ -171,3 +171,35 @@ def handle_list_panels(panels, hgnc_dump, r_code):
                 f"with commas '{panels}'"
             )
             return None
+
+
+def extract_panelapp_id(panels):
+    """ Extract the panelapp id from the target in the test directory
+
+    Args:
+        panels (iter): Iterable containing the panels to look at
+
+    Returns:
+        list: List of panelapp ids
+    """
+
+    panelapp_ids = []
+
+    for panel in panels:
+        match = regex.search(r"\([0-9]+\)", panel)
+
+        if match:
+            result = match.group(0).strip("()")
+            panelapp_ids.append(result)
+        else:
+            match = regex.search(r"\([0-9& ]+\)", panel)
+
+            if match:
+                result = match.group(0).strip("()")
+                panelapp_ids.extend(x.strip() for x in result.split("&"))
+            else:
+                raise Exception(
+                    f"'{panels}' hasn't been recognised as a panelapp panel"
+                )
+
+    return panelapp_ids
