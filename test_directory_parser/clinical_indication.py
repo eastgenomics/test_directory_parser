@@ -7,7 +7,7 @@ class ClinicalIndication:
     def __init__(self, r_code, name, panels, test_method, hgnc_dump):
         self.r_code = r_code
         # R424 has a space at the end of its name
-        self.name = name.strip()
+        self.name = name.replace("–", "-").strip()
 
         if "gene" in test_method:
             self.gemini_name = f"{self.r_code}_{self.name}_G"
