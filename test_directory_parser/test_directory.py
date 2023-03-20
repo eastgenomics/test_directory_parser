@@ -40,7 +40,7 @@ class TestDirectory:
 
             # handled clinical indications by the lab and that will be stored
             # in panel palace
-            if test_method in self.config["ngs_test_methods"]:
+            if test_method.strip() in self.config["ngs_test_methods"]:
                 self.ngs_clinical_indications.append(ci)
 
             self.all_clinical_indications.append(ci)
