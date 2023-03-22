@@ -1,6 +1,8 @@
 import argparse
 import json
 
+from panelapp import queries
+
 from test_directory_parser import rare_disease
 from test_directory_parser import utils
 from test_directory_parser import test_directory
@@ -30,13 +32,32 @@ def main(args):
 
     elif cmd == "cancer":
         print("Parsing of the cancer test directory is not implemented yet")
+
     elif cmd == "checker":
         session, meta = utils.connect_to_panel_database(
             args.username, args.passwd
         )
-        td_parser_output = json.loads(args.td_parser_output)
-        output_checker.compare_panelapp_panels_content(
-            session, meta, td_parser_output
+        td_parser_output = json.load(open(args.td_parser_output))
+
+        cis = output_checker.get_clinical_indications(
+            td_parser_output, args.filter
+        )
+
+        panelapp_panels = queries.get_all_signedoff_panels()
+
+        (
+            absent_genes, genes_no_clinical_transcripts
+        ) = output_checker.compare_panelapp_panels_content(
+            session, meta, td_parser_output, panelapp_panels
+        )
+
+        output_checker.write_output(
+            cis, f"clinical_indication_with_{args.filter}.txt"
+        )
+        output_checker.write_output(absent_genes, "genes_not_in_database.txt")
+        output_checker.write_output(
+            genes_no_clinical_transcripts,
+            "genes_with_no_clinical_transcripts.txt"
         )
     else:
         raise Exception(f"'{cmd}' is not a valid option")
@@ -65,6 +86,9 @@ if __name__ == "__main__":
     )
     checker_parser.add_argument(
         "td_parser_output", help="Json output of the test directory parser"
+    )
+    checker_parser.add_argument(
+        "-f", "--filter", help="Filter option on the change column"
     )
     checker_parser.set_defaults(which="checker")
 
