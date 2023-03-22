@@ -36,11 +36,29 @@ def parse_rare_disease_td(test_directory, config):
 
     for sheet in xls:
         if sheet == config["sheet_of_interest"]:
+            # find name of change column
+            change_column = [
+                col for col in xls[sheet].columns
+                if config['changes_column'] in col
+            ]
+
+            if change_column:
+                if len(change_column) == 1:
+                    change_column = change_column[0]
+                else:
+                    raise (
+                        "2 or more columns were detected as having 'Changes' "
+                        "in their name breaking the changes gathering."
+                    )
+            else:
+                raise "Couldn't find the change column."
+
             data = xls[sheet].loc(axis=1)[
                 config["clinical_indication_column_code"],
                 config["clinical_indication_column_name"],
                 config["panel_column"],
-                config["test_method_column"]
+                config["test_method_column"],
+                change_column
             ]
 
-    return data
+    return data, change_column
