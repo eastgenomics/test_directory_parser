@@ -19,11 +19,11 @@ def main(args):
 
         hgnc_data = utils.parse_tsv(args.hgnc)
         config_data = rare_disease.parse_config(args.config)
-        sheet = rare_disease.parse_rare_disease_td(
+        sheet, change_column = rare_disease.parse_rare_disease_td(
             args.test_directory, config_data
         )
         rd_test_directory = test_directory.TestDirectory(
-            sheet, config_data, "rare_disease", hgnc_data
+            sheet, change_column, config_data, "rare_disease", hgnc_data
         )
         rd_test_directory.setup_clinical_indications()
         rd_test_directory.output_json(output)
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     checker_parser.add_argument(
         "td_parser_output", help="Json output of the test directory parser"
     )
-    checker_parser.set_defaults("checker")
+    checker_parser.set_defaults(which="checker")
 
     parser.add_argument(
         "config", help="Config file to know which sheet to gather for example"
