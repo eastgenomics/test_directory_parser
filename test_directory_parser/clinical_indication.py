@@ -4,7 +4,7 @@ from test_directory_parser import utils
 
 
 class ClinicalIndication:
-    def __init__(self, r_code, name, panels, test_method, hgnc_dump):
+    def __init__(self, r_code, name, panels, test_method, change, hgnc_dump):
         self.r_code = r_code
         # R424 has a space at the end of its name
         self.name = name.replace("–", "-").strip()
@@ -17,6 +17,7 @@ class ClinicalIndication:
         self.original_targets = panels
         self.panels = None
         self.test_method = test_method
+        self.change = change
         self.clean_panels(hgnc_dump)
 
     def clean_panels(self, hgnc_dump):
