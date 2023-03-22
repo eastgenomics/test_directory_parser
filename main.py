@@ -46,6 +46,18 @@ if __name__ == "__main__":
     cancer_parser.add_argument("test_directory", help="Path to test directory")
     cancer_parser.set_defaults(which="cancer")
 
+    checker_parser = subparsers.add_parser("checker")
+    checker_parser.add_argument(
+        "username", help="Username for the panel database"
+    )
+    checker_parser.add_argument(
+        "passwd", help="Password for given username"
+    )
+    checker_parser.add_argument(
+        "td_parser_output", help="Json output of the test directory parser"
+    )
+    checker_parser.set_defaults("checker")
+
     parser.add_argument(
         "config", help="Config file to know which sheet to gather for example"
     )
