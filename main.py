@@ -69,7 +69,8 @@ if __name__ == "__main__":
     checker_parser.set_defaults(which="checker")
 
     parser.add_argument(
-        "config", help="Config file to know which sheet to gather for example"
+        "-c", "--config",
+        help="Config file to know which sheet to gather for example"
     )
     parser.add_argument("-hgnc", "--hgnc", help="Path to the hgnc dump")
     parser.add_argument("-o", "--output", help="Output path and name")
