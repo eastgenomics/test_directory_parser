@@ -1,8 +1,10 @@
 import argparse
+import json
 
 from test_directory_parser import rare_disease
 from test_directory_parser import utils
 from test_directory_parser import test_directory
+from test_directory_parser import output_checker
 
 
 def main(args):
@@ -28,6 +30,14 @@ def main(args):
 
     elif cmd == "cancer":
         print("Parsing of the cancer test directory is not implemented yet")
+    elif cmd == "checker":
+        session, meta = utils.connect_to_panel_database(
+            args.username, args.passwd
+        )
+        td_parser_output = json.loads(args.td_parser_output)
+        output_checker.compare_panelapp_panels_content(
+            session, meta, td_parser_output
+        )
     else:
         raise Exception(f"'{cmd}' is not a valid option")
 
