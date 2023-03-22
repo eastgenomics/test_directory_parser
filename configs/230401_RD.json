@@ -1,0 +1,18 @@
+{
+    "name": "230401_RD",
+    "sheet_of_interest": "R&ID indications",
+    "clinical_indication_column_code": "Test ID",
+    "clinical_indication_column_name": "Clinical Indication",
+    "panel_column": "Target/Genes",
+    "test_method_column": "Test Method",
+    "header_index": 1,
+    "ngs_test_methods": [
+        "Medium panel", "Single gene sequencing <=10 amplicons",
+        "Single gene sequencing <10 amplicons",
+        "Single gene sequencing >=10 amplicons",
+        "Single gene testing (<10 amplicons)", "small panel", "Small panel",
+        "Small panel - deep sequencing", "WES or Large panel", "WES or Large Panel",
+        "WES or Large penel", "WES or Medium panel", "WES or Medium Panel",
+        "WES or Small Panel", "WGS"
+    ]
+}
