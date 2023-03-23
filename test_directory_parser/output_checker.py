@@ -12,8 +12,10 @@ def extract_latest_version(versions):
             max_add_on_version = max([
                 Version(version.split("|")[1]) for version in add_on_versions
             ])
+
         else:
             max_add_on_version = add_on_versions[0].split("|")[1]
+
     else:
         return max([
             Version(version) for version in versions
@@ -43,9 +45,11 @@ def get_current_panel_genes(session, meta, panelapp_id):
 
     if len(genes) == 1:
         return set(list(genes.values())[0])
+
     elif len(genes) >= 2:
         latest_version = extract_latest_version(genes.keys())
         return genes[str(latest_version)]
+
     else:
         return
 
@@ -88,8 +92,11 @@ def compare_panelapp_panels_content(
     all_no_clinical_transcripts = set()
 
     for indication in td_parser_output["indications"]:
-        if indication["panels"]:
-            for panelapp_id in indication["panels"]:
+        panels = indication["panels"]
+        code = indication["code"]
+
+        if panels:
+            for panelapp_id in panels:
                 if regex.search(r"^[0-9]+", panelapp_id):
                     current_genes = get_current_panel_genes(
                         session, meta, panelapp_id
@@ -101,7 +108,9 @@ def compare_panelapp_panels_content(
                     ])
 
                     if not current_genes:
-                        print(f"{indication['code']} might be missing from the current database")
+                        print(
+                            f"{code} might be missing from the current database"
+                        )
                         continue
 
                     new_genes = panelapp_genes.difference(current_genes)
@@ -110,12 +119,10 @@ def compare_panelapp_panels_content(
                         absent_genes, no_clinical_transcripts
                     ) = check_genes_in_database(session, meta, new_genes)
 
-                    panel_absent_genes.setdefault(
-                        indication["code"], set()
-                    ).update(absent_genes)
-                    panel_no_clinical_transcripts.setdefault(
-                        indication["code"], set()
-                    ).update(no_clinical_transcripts)
+                    panel_absent_genes.setdefault(code, set())\
+                        .update(absent_genes)
+                    panel_no_clinical_transcripts.setdefault(code, set())\
+                        .update(no_clinical_transcripts)
 
                     all_absent_genes.update(absent_genes)
                     all_no_clinical_transcripts.update(
