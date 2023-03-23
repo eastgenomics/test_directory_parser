@@ -1,6 +1,29 @@
 import re
 
+from packaging.version import Version
 import regex
+
+
+def extract_latest_version(versions):
+    print(versions)
+    add_on_versions = [version for version in versions if "|" in version]
+
+    if add_on_versions:
+        if len(add_on_versions) > 1:
+            max_add_on_version = max([
+                Version(version.split("|")[1]) for version in add_on_versions
+            ])
+        else:
+            max_add_on_version = add_on_versions[0].split("|")[1]
+    else:
+        return max([
+            Version(version) for version in versions
+        ])
+
+    return [
+        version for version in versions
+        if f"|{str(max_add_on_version)}" in version
+    ][0]
 
 
 def get_current_panel_genes(session, meta, panelapp_id):
@@ -22,7 +45,8 @@ def get_current_panel_genes(session, meta, panelapp_id):
     if len(genes) == 1:
         return set(list(genes.values())[0])
     else:
-        return
+        latest_version = extract_latest_version(genes.keys())
+        return genes[str(latest_version)]
 
 
 def check_genes_in_database(session, meta, genes):
@@ -63,54 +87,48 @@ def compare_panelapp_panels_content(
     all_no_clinical_transcripts = set()
 
     for indication in td_parser_output["indications"]:
-        panelapp_regex = "panelapp"
-        ci_regex = "new clinical indication"
+        if indication["panels"]:
+            for panelapp_id in indication["panels"]:
+                if regex.search(r"^[0-9]+", panelapp_id):
+                    current_genes = get_current_panel_genes(
+                        session, meta, panelapp_id
+                    )
+                    panelapp_genes = signedoff_panels[int(panelapp_id)]\
+                        .get_genes()
+                    panelapp_genes = set([
+                        gene["hgnc_id"] for gene in panelapp_genes
+                    ])
 
-        if (
-            regex.search(
-                panelapp_regex, indication["changes"], re.IGNORECASE
-            ) or regex.search(
-                ci_regex, indication["changes"], re.IGNORECASE
-            )
-        ):
-            if indication["panels"]:
-                for panelapp_id in indication["panels"]:
-                    if regex.search(r"^[0-9]+", panelapp_id):
-                        current_genes = get_current_panel_genes(
-                            session, meta, panelapp_id
+                    if not current_genes:
+                        print(f"{indication['code']} might be missing from the current database")
+                        continue
+
+                    if panelapp_genes and current_genes:
+                        new_genes = panelapp_genes.difference(
+                            current_genes
                         )
-                        panelapp_genes = signedoff_panels[int(panelapp_id)]\
-                            .get_genes()
-                        panelapp_genes = set([
-                            gene["hgnc_id"] for gene in panelapp_genes
-                        ])
 
-                        if panelapp_genes and current_genes:
-                            new_genes = panelapp_genes.difference(
-                                current_genes
-                            )
+                        (
+                            absent_genes, no_clinical_transcripts
+                        ) = check_genes_in_database(
+                            session, meta, new_genes
+                        )
 
-                            (
-                                absent_genes, no_clinical_transcripts
-                            ) = check_genes_in_database(
-                                session, meta, new_genes
-                            )
+                        panel_absent_genes.setdefault(
+                            indication["code"], set()
+                        ).update(absent_genes)
+                        panel_no_clinical_transcripts.setdefault(
+                            indication["code"], set()
+                        ).update(no_clinical_transcripts)
 
-                            panel_absent_genes.setdefault(
-                                indication["code"], set()
-                            ).update(absent_genes)
-                            panel_no_clinical_transcripts.setdefault(
-                                indication["code"], set()
-                            ).update(no_clinical_transcripts)
-
-                            all_absent_genes.update(absent_genes)
-                            all_no_clinical_transcripts.update(
-                                no_clinical_transcripts
-                            )
-                        else:
-                            print(
-                                f"Please check {indication['code']} manually"
-                            )
+                        all_absent_genes.update(absent_genes)
+                        all_no_clinical_transcripts.update(
+                            no_clinical_transcripts
+                        )
+                    else:
+                        print(
+                            f"Please check {indication['code']} manually"
+                        )
 
     return (
         panel_absent_genes, panel_no_clinical_transcripts,
