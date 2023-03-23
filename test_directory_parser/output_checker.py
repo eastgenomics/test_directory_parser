@@ -104,32 +104,23 @@ def compare_panelapp_panels_content(
                         print(f"{indication['code']} might be missing from the current database")
                         continue
 
-                    if panelapp_genes and current_genes:
-                        new_genes = panelapp_genes.difference(
-                            current_genes
-                        )
+                    new_genes = panelapp_genes.difference(current_genes)
 
-                        (
-                            absent_genes, no_clinical_transcripts
-                        ) = check_genes_in_database(
-                            session, meta, new_genes
-                        )
+                    (
+                        absent_genes, no_clinical_transcripts
+                    ) = check_genes_in_database(session, meta, new_genes)
 
-                        panel_absent_genes.setdefault(
-                            indication["code"], set()
-                        ).update(absent_genes)
-                        panel_no_clinical_transcripts.setdefault(
-                            indication["code"], set()
-                        ).update(no_clinical_transcripts)
+                    panel_absent_genes.setdefault(
+                        indication["code"], set()
+                    ).update(absent_genes)
+                    panel_no_clinical_transcripts.setdefault(
+                        indication["code"], set()
+                    ).update(no_clinical_transcripts)
 
-                        all_absent_genes.update(absent_genes)
-                        all_no_clinical_transcripts.update(
-                            no_clinical_transcripts
-                        )
-                    else:
-                        print(
-                            f"Please check {indication['code']} manually"
-                        )
+                    all_absent_genes.update(absent_genes)
+                    all_no_clinical_transcripts.update(
+                        no_clinical_transcripts
+                    )
 
     return (
         panel_absent_genes, panel_no_clinical_transcripts,
