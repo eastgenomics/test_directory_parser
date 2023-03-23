@@ -56,11 +56,23 @@ def compare_panelapp_panels_content(
     session, meta, td_parser_output, signedoff_panels
 ):
 
+    panel_absent_genes = {}
+    panel_no_clinical_transcripts = {}
+
     all_absent_genes = set()
     all_no_clinical_transcripts = set()
 
     for indication in td_parser_output["indications"]:
-        if regex.search("panelapp", indication["changes"], re.IGNORECASE):
+        panelapp_regex = "panelapp"
+        ci_regex = "new clinical indication"
+
+        if (
+            regex.search(
+                panelapp_regex, indication["changes"], re.IGNORECASE
+            ) or regex.search(
+                ci_regex, indication["changes"], re.IGNORECASE
+            )
+        ):
             if indication["panels"]:
                 for panelapp_id in indication["panels"]:
                     if regex.search(r"^[0-9]+", panelapp_id):
@@ -84,6 +96,13 @@ def compare_panelapp_panels_content(
                                 session, meta, new_genes
                             )
 
+                            panel_absent_genes.setdefault(
+                                indication["code"], set()
+                            ).update(absent_genes)
+                            panel_no_clinical_transcripts.setdefault(
+                                indication["code"], set()
+                            ).update(no_clinical_transcripts)
+
                             all_absent_genes.update(absent_genes)
                             all_no_clinical_transcripts.update(
                                 no_clinical_transcripts
@@ -93,10 +112,20 @@ def compare_panelapp_panels_content(
                                 f"Please check {indication['code']} manually"
                             )
 
-    return all_absent_genes, all_no_clinical_transcripts
+    return (
+        panel_absent_genes, panel_no_clinical_transcripts,
+        all_absent_genes, all_no_clinical_transcripts
+    )
 
 
-def write_output(iterable_of_things, name):
+def write_dict(data_dict, name):
+    with open(name, "w") as f:
+        for key, values in data_dict.items():
+            for value in values:
+                f.write(f"{key}\t{value}\n")
+
+
+def write_list(iterable_of_things, name):
     with open(name, "w") as f:
         for gene in iterable_of_things:
             f.write(f"{gene}\n")
