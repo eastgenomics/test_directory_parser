@@ -5,7 +5,6 @@ import regex
 
 
 def extract_latest_version(versions):
-    print(versions)
     add_on_versions = [version for version in versions if "|" in version]
 
     if add_on_versions:
@@ -44,9 +43,11 @@ def get_current_panel_genes(session, meta, panelapp_id):
 
     if len(genes) == 1:
         return set(list(genes.values())[0])
-    else:
+    elif len(genes) >= 2:
         latest_version = extract_latest_version(genes.keys())
         return genes[str(latest_version)]
+    else:
+        return
 
 
 def check_genes_in_database(session, meta, genes):
