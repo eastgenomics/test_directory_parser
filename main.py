@@ -46,16 +46,24 @@ def main(args):
         panelapp_panels = queries.get_all_signedoff_panels()
 
         (
+            absent_genes_per_panel, no_clinical_transcripts_per_panel,
             absent_genes, genes_no_clinical_transcripts
         ) = output_checker.compare_panelapp_panels_content(
             session, meta, td_parser_output, panelapp_panels
         )
 
-        output_checker.write_output(
+        output_checker.write_dict(
+            absent_genes_per_panel, "absent_genes_per_panel.txt"
+        )
+        output_checker.write_dict(
+            no_clinical_transcripts_per_panel,
+            "no_clinical_transcritps_per_panel.txt"
+        )
+        output_checker.write_list(
             cis, f"clinical_indication_with_{args.filter}.txt"
         )
-        output_checker.write_output(absent_genes, "genes_not_in_database.txt")
-        output_checker.write_output(
+        output_checker.write_list(absent_genes, "genes_not_in_database.txt")
+        output_checker.write_list(
             genes_no_clinical_transcripts,
             "genes_with_no_clinical_transcripts.txt"
         )
