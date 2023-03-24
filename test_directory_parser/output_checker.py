@@ -201,11 +201,17 @@ def compare_panelapp_panels_content(
                     # sense check to see if the panel id and the panel name
                     # match
                     panel = signedoff_panels[int(panelapp_id)]
+                    cleaned_panel_name = panel.name.strip("(GMS)")\
+                        .lower().strip()
 
-                    if panel.name not in indication["original_targets"]:
-                        raise Exception(
-                            f"The panel id in the TD {panelapp_id} doesn't "
-                            "match the name"
+                    if (
+                        cleaned_panel_name not in 
+                        indication["original_targets"].lower()
+                    ):
+                        print(
+                            f"Warning: The panel id in the TD '{panelapp_id}' "
+                            f"doesn't match the name for {code}: {panel.name} "
+                            f"!= {indication['original_targets']}"
                         )
 
                     # get the green genes of panelapp panel
