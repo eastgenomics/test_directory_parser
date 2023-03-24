@@ -43,7 +43,7 @@ def main(args):
             cis = output_checker.get_clinical_indications(
                 td_parser_output, args.filter
             )
-            output_checker.write_list(
+            output_checker.write_data(
                 cis, f"clinical_indication_with_{args.filter}.txt"
             )
 
@@ -56,16 +56,16 @@ def main(args):
             session, meta, td_parser_output, panelapp_panels
         )
 
-        output_checker.write_dict(
+        output_checker.write_data(
             absent_genes_per_panel, "absent_genes_per_panel.txt"
         )
-        output_checker.write_dict(
+        output_checker.write_data(
             no_clinical_transcripts_per_panel,
             "no_clinical_transcritps_per_panel.txt"
         )
 
-        output_checker.write_list(absent_genes, "genes_not_in_database.txt")
-        output_checker.write_list(
+        output_checker.write_data(absent_genes, "genes_not_in_database.txt")
+        output_checker.write_data(
             genes_no_clinical_transcripts,
             "genes_with_no_clinical_transcripts.txt"
         )
