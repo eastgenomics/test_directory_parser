@@ -5,6 +5,7 @@
     "clinical_indication_column_name": "Clinical Indication",
     "panel_column": "Target/Genes",
     "test_method_column": "Test Method",
+    "changes_column": "Changes",
     "header_index": 1,
     "ngs_test_methods": [
         "Medium panel", "Single gene sequencing <=10 amplicons",
