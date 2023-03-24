@@ -66,11 +66,25 @@ def extract_latest_version(versions):
 
 
 def get_current_panel_genes(session, meta, panelapp_id):
+    """From a panelapp id, get the content of the panel from the panel database
+
+    Args:
+        session (Session object): SQLAlchemy Session object connected to the
+            panel database
+        meta (Meta object): SQLAlchemy Meta object
+        panelapp_id (str): String with the panelapp id of interest
+
+    Returns:
+        set: Set containing genes of the latest panel version of the panel
+    """
+
     panel_tb = meta.tables["panel"]
     feature_tb = meta.tables["feature"]
     panel_features_tb = meta.tables["panel_features"]
     gene_tb = meta.tables["gene"]
 
+    # query the database for the hgnc ids and panel version of a panel
+    # using its panelapp id
     res = session.query(gene_tb.c.hgnc_id, panel_features_tb.c.panel_version)\
         .select_from(gene_tb)\
         .join(feature_tb).join(panel_features_tb).join(panel_tb)\
@@ -78,12 +92,15 @@ def get_current_panel_genes(session, meta, panelapp_id):
 
     genes = {}
 
+    # for each row of result, store the genes using the panel version as a key
     for hgnc_id, panel_version in res:
         genes.setdefault(panel_version, []).append(hgnc_id)
 
+    # only 1 panel version recovered, return the values
     if len(genes) == 1:
         return set(list(genes.values())[0])
 
+    # 2 or more version detected, so get latest version
     elif len(genes) >= 2:
         latest_version = extract_latest_version(genes.keys())
         return genes[str(latest_version)]
@@ -93,6 +110,20 @@ def get_current_panel_genes(session, meta, panelapp_id):
 
 
 def check_genes_in_database(session, meta, genes):
+    """ Check if the genes given are present in the database and if they have
+    clinical transcripts
+
+    Args:
+        session (Session object): SQLAlchemy Session object connected to the
+            panel database
+        meta (Meta object): SQLAlchemy Meta object
+        genes (iterable): Iterable of genes (HGNC ids)
+
+    Returns:
+        list: List of sets for genes not present in the database and genes
+        that don't have clinical transcripts
+    """
+
     gene_tb = meta.tables["gene"]
     g2t_tb = meta.tables["genes2transcripts"]
 
@@ -100,12 +131,17 @@ def check_genes_in_database(session, meta, genes):
     no_clinical_transcripts = set()
 
     for gene in genes:
+        # query the database using the HGNC id and join the gene and g2t tables
         query = session.query(gene_tb.c.hgnc_id, g2t_tb.c.clinical_transcript)\
             .join(g2t_tb)\
             .filter(gene_tb.c.hgnc_id == gene).all()
 
         if query:
             has_clinical_tx = False
+
+            # for every hgnc id/transcript couple, check if the clinical
+            # transcript status == 1
+            # i.e. the transcript is the clinical transcript
             for hgnc_id, clinical_transcript in query:
                 if clinical_transcript == 1:
                     has_clinical_tx = True
@@ -122,6 +158,24 @@ def check_genes_in_database(session, meta, genes):
 def compare_panelapp_panels_content(
     session, meta, td_parser_output, signedoff_panels
 ):
+    """ Compare the content of the latest signedoff version of a panelapp panel
+    with what is present in the database
+
+    Args:
+        session (Session object): SQLAlchemy Session object connected to the
+            panel database
+        meta (Meta object): SQLAlchemy Meta object
+        td_parser_output (dict): Dict of the json td parser output
+        signedoff_panels (dict): Dict of the signedoff panelapp panels
+        (key = panelapp id, value = Panelapp object)
+
+    Returns:
+        list: List of iterables:
+            - dict: absent genes per panel
+            - dict: genes with no clinical transcript per panel
+            - set: absent genes total
+            - set: genes with no clinical transcript total
+    """
 
     panel_absent_genes = {}
     panel_no_clinical_transcripts = {}
@@ -129,16 +183,21 @@ def compare_panelapp_panels_content(
     all_absent_genes = set()
     all_no_clinical_transcripts = set()
 
+    # loop the clinical indication of the test directory
     for indication in td_parser_output["indications"]:
         panels = indication["panels"]
         code = indication["code"]
 
         if panels:
+            # clinical indications can have multiple panels
             for panelapp_id in panels:
+                # check if the target is a panelapp panel or single genes
                 if regex.search(r"^[0-9]+", panelapp_id):
+                    # get the genes in the database
                     current_genes = get_current_panel_genes(
                         session, meta, panelapp_id
                     )
+                    # get the green genes of panelapp panel
                     panelapp_genes = signedoff_panels[int(panelapp_id)]\
                         .get_genes()
                     panelapp_genes = set([
@@ -151,6 +210,7 @@ def compare_panelapp_panels_content(
                         )
                         continue
 
+                    # this will give us the new genes coming in the update
                     new_genes = panelapp_genes.difference(current_genes)
 
                     (
@@ -173,17 +233,16 @@ def compare_panelapp_panels_content(
     )
 
 
-def write_dict(data_dict, name):
+def write_data(data, name):
     with open(name, "w") as f:
-        for key, values in data_dict.items():
-            for value in values:
-                f.write(f"{key}\t{value}\n")
+        if isinstance(data, dict):
+            for key, values in data.items():
+                for value in values:
+                    f.write(f"{key}\t{value}\n")
 
-
-def write_list(iterable_of_things, name):
-    with open(name, "w") as f:
-        for gene in iterable_of_things:
-            f.write(f"{gene}\n")
+        elif isinstance(data, (list, tuple, set)):
+            for d in data:
+                f.write(f"{d}\n")
 
 
 def get_clinical_indications(td_parser_output, filter_option):
