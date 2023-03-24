@@ -253,6 +253,17 @@ def write_data(data, name):
 
 
 def get_clinical_indications(td_parser_output, filter_option):
+    """ Get clinical indication according to the given filter option on the
+    change column of the test directory
+
+    Args:
+        td_parser_output (dict): Dict of data from the test directory
+        filter_option (str): String to filter with
+
+    Returns:
+        list: List of clinical indication codes
+    """
+
     output = []
 
     for indication in td_parser_output["indications"]:
