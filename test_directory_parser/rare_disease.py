@@ -46,12 +46,12 @@ def parse_rare_disease_td(test_directory, config):
                 if len(change_column) == 1:
                     change_column = change_column[0]
                 else:
-                    raise (
+                    raise Exception((
                         "2 or more columns were detected as having 'Changes' "
                         "in their name breaking the changes gathering."
-                    )
+                    ))
             else:
-                raise "Couldn't find the change column."
+                raise Exception("Couldn't find the change column.")
 
             data = xls[sheet].loc(axis=1)[
                 config["clinical_indication_column_code"],
