@@ -234,6 +234,13 @@ def compare_panelapp_panels_content(
 
 
 def write_data(data, name):
+    """ Write the data
+
+    Args:
+        data (iterable): Iterable object to write
+        name (str): Name of the output file
+    """
+
     with open(name, "w") as f:
         if isinstance(data, dict):
             for key, values in data.items():
