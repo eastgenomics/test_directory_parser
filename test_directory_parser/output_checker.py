@@ -34,7 +34,7 @@ def extract_latest_version(versions):
         return multiple_latest_versions[0]
 
     elif len(multiple_latest_versions) == 0:
-        raise f"Couldn't get the latest version given: '{versions}'"
+        raise Exception(f"Couldn't get the latest version given: '{versions}'")
 
     else:
         # if we have multiple elements in the list, that probably means that
@@ -59,10 +59,10 @@ def extract_latest_version(versions):
 
         else:
             # i mean, i wouldn't understand what is going on there
-            raise (
+            raise Exception((
                 "No add on versions detected where there shouldn't be: "
                 f"'{versions}'"
-            )
+            ))
 
 
 def get_current_panel_genes(session, meta, panelapp_id):
@@ -197,6 +197,17 @@ def compare_panelapp_panels_content(
                     current_genes = get_current_panel_genes(
                         session, meta, panelapp_id
                     )
+
+                    # sense check to see if the panel id and the panel name
+                    # match
+                    panel = signedoff_panels[int(panelapp_id)]
+
+                    if panel.name not in indication["original_targets"]:
+                        raise Exception(
+                            f"The panel id in the TD {panelapp_id} doesn't "
+                            "match the name"
+                        )
+
                     # get the green genes of panelapp panel
                     panelapp_genes = signedoff_panels[int(panelapp_id)]\
                         .get_genes()
