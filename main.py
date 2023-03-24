@@ -57,11 +57,11 @@ def main(args):
         )
 
         output_checker.write_data(
-            absent_genes_per_panel, "absent_genes_per_panel.txt"
+            absent_genes_per_panel, "absent_genes_per_clinical_indication.txt"
         )
         output_checker.write_data(
             no_clinical_transcripts_per_panel,
-            "no_clinical_transcritps_per_panel.txt"
+            "no_clinical_transcripts_per_clinical_indication.txt"
         )
 
         output_checker.write_data(absent_genes, "genes_not_in_database.txt")
