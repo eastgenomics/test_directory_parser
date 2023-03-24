@@ -14,14 +14,22 @@ def extract_latest_version(versions):
         Version: Version type object
     """
 
+    # get the latest version using the base version since we might have a
+    # mixture of add on panels (2.0|1) and normal panels (2.0, 2.1)
+    # i.e. ["2.0", "2.1", "2.1|1"] --> "2.1"
     latest_version = max(
         [Version(version.split("|")[0]) for version in versions]
     )
 
+    # since we have add on version we need to get all versions that contain
+    # the previously gathered max version
+    # i.e. ["2.0", "2.1", "2.1|1"] --> ["2.1", "2.1|1"]
     multiple_latest_versions = [
         version for version in versions if str(latest_version) in version
     ]
 
+    # if we get only 1 element in the list, we can confidently return the max
+    # version
     if len(multiple_latest_versions) == 1:
         return multiple_latest_versions[0]
 
@@ -29,10 +37,15 @@ def extract_latest_version(versions):
         raise f"Couldn't get the latest version given: '{versions}'"
 
     else:
+        # if we have multiple elements in the list, that probably means that
+        # we have at least one add on version in the list.
+        # We need to check whether we have only one or multiple
         add_on_versions = [
             version for version in multiple_latest_versions if "|" in version
         ]
 
+        # if we have multiple add on, do a version check on the version after
+        # the pipe to finally return the latest of the add on panel versions
         if len(add_on_versions) >= 1:
             max_add_on_version = max([
                 Version(version.split("|")[1])
@@ -45,6 +58,7 @@ def extract_latest_version(versions):
             ][0]
 
         else:
+            # i mean, i wouldn't understand what is going on there
             raise (
                 "No add on versions detected where there shouldn't be: "
                 f"'{versions}'"
