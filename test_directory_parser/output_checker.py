@@ -5,26 +5,50 @@ import regex
 
 
 def extract_latest_version(versions):
-    add_on_versions = [version for version in versions if "|" in version]
+    """ Given an iterable of versions, returns the latest version
 
-    if add_on_versions:
-        if len(add_on_versions) > 1:
-            max_add_on_version = max([
-                Version(version.split("|")[1]) for version in add_on_versions
-            ])
+    Args:
+        versions (iter): Iterable of version parsable strings
 
-        else:
-            max_add_on_version = add_on_versions[0].split("|")[1]
+    Returns:
+        Version: Version type object
+    """
+
+    latest_version = max(
+        [Version(version.split("|")[0]) for version in versions]
+    )
+
+    multiple_latest_versions = [
+        version for version in versions if str(latest_version) in version
+    ]
+
+    if len(multiple_latest_versions) == 1:
+        return multiple_latest_versions[0]
+
+    elif len(multiple_latest_versions) == 0:
+        raise f"Couldn't get the latest version given: '{versions}'"
 
     else:
-        return max([
-            Version(version) for version in versions
-        ])
+        add_on_versions = [
+            version for version in multiple_latest_versions if "|" in version
+        ]
 
-    return [
-        version for version in versions
-        if f"|{str(max_add_on_version)}" in version
-    ][0]
+        if len(add_on_versions) >= 1:
+            max_add_on_version = max([
+                Version(version.split("|")[1])
+                for version in add_on_versions
+            ])
+
+            return [
+                version for version in versions
+                if f"|{str(max_add_on_version)}" in version
+            ][0]
+
+        else:
+            raise (
+                "No add on versions detected where there shouldn't be: "
+                f"'{versions}'"
+            )
 
 
 def get_current_panel_genes(session, meta, panelapp_id):
