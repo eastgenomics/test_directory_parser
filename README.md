@@ -61,8 +61,33 @@ The `ngs_test_methods` field contains the test methods that we want to keep, so 
 
 ## How to run
 
-```bash
-source envs/test_directory_parser/bin/activate
+Setup your environment first:
 
-python main.py --hgnc ${hgnc_dump.txt} rare_disease ${test_directory.xlsx} configs/220421_RD.json
+```bash
+python3 -m venv ${path_to_env}/${env_name}
+source ${path_to_env}/${env_name}/bin/activate
+pip install -r requirements.txt
+```
+
+There are 2 main modes for this script:
+
+- Parse the test directory (only rare disease for now)
+
+```bash
+# outputs a json containing cleaned data from the given test directory
+python main.py --hgnc ${hgnc_dump.txt} rare_disease ${test_directory.xslx} configs/${config} [-o ${output_path}]
+```
+
+- Check content of given test directory against panel database and output:
+  - absent_genes_per_panel.txt: TSV with clinical indications and the potential genes that are absent from the database
+  - no_clinical_transcript_per_clinical_indication.txt: TSV with clinical indications and the genes that don't have clinical transcripts
+  - absent_genes_per_panel.txt: Text file with all genes that need to be added in the database (removes some duplicates)
+  - genes_with_no_clinical_transcripts.txt: Text file with all genes that have no clinical transcripts in the database
+  - (optional) clinical_indication_with_${string_filter}.txt: Text file with clinical indication codes filtered on the change column using a string filter
+
+```bash
+# output mandatory check files
+python main.py checker ${panel_database_username} ${panel_database_passwd} configs/${config}
+# output all the files
+python main.py checker ${panel_database_username} ${panel_database_passwd} configs/${config} -f ${filter_string}
 ```

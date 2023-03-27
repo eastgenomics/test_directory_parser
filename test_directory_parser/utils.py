@@ -1,8 +1,34 @@
 import datetime
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql.schema import MetaData
 import numpy as np
 import pandas as pd
 import regex
+
+
+def connect_to_panel_database(user, passwd):
+    """ Return cursor of panel_database
+    Args:
+        user (str): Username for the database
+        passwd (str): Password for the user
+    Returns:
+        tuple: SQLAlchemy session obj, SQLAlchemy meta obj
+    """
+
+    try:
+        db = create_engine(
+            f"mysql://{user}:{passwd}@127.0.0.1/panel_database"
+        )
+    except Exception as e:
+        raise e
+    else:
+        meta = MetaData()
+        meta.reflect(bind=db)
+        Session = sessionmaker(bind=db)
+        session = Session()
+        return session, meta
 
 
 def get_date():
