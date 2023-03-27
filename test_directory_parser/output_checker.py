@@ -54,7 +54,7 @@ def extract_latest_version(versions):
 
             return [
                 version for version in versions
-                if f"|{str(max_add_on_version)}" in version
+                if f"|{max_add_on_version}" in version
             ][0]
 
         else:
