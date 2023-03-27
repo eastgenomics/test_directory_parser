@@ -47,7 +47,8 @@ def parse_rare_disease_td(test_directory, config):
                     change_column = change_column[0]
                 else:
                     raise Exception((
-                        "2 or more columns were detected as having 'Changes' "
+                        "2 or more columns were detected as having "
+                        f"'{config['changes_column']}' "
                         "in their name breaking the changes gathering."
                     ))
             else:
