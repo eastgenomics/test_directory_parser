@@ -39,7 +39,7 @@ def parse_rare_disease_td(test_directory, config):
             # find name of change column
             change_column = [
                 col for col in xls[sheet].columns
-                if config['changes_column'] in col
+                if config['changes_column'].lower() in col.lower()
             ]
 
             if change_column:
