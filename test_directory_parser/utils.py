@@ -8,8 +8,8 @@ import pandas as pd
 import regex
 
 
-def connect_to_panel_database(user, passwd, db):
-    """ Return cursor of panel_database
+def connect_to_local_database(user, passwd, db):
+    """ Return cursor of database
     Args:
         user (str): Username for the database
         passwd (str): Password for the user
