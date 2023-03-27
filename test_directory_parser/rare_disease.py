@@ -49,7 +49,8 @@ def parse_rare_disease_td(test_directory, config):
                     raise Exception((
                         "2 or more columns were detected as having "
                         f"'{config['changes_column']}' "
-                        "in their name breaking the changes gathering."
+                        "in their name breaking the changes gathering.\n"
+                        f"Matched column names: {';'.join(change_column)}"
                     ))
             else:
                 raise Exception("Couldn't find the change column.")
