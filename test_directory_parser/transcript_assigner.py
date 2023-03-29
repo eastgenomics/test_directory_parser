@@ -1,4 +1,16 @@
+import datetime
+
 from test_directory_parser import utils
+
+
+def get_date_for_db():
+    """ Return date in YYYY-MM-DD format for insertion in database
+
+    Returns:
+        str: String with date
+    """
+
+    return datetime.datetime.now().strftime("%Y-%m-%d")
 
 
 def parse_mane_file(mane_file, hgnc_dump):
@@ -161,13 +173,37 @@ def write_sql_queries(data, output_path):
 
     with open(output_path, "w") as f:
         for gene in data:
+            f.write(f"INSERT INTO gene (hgnc_id) VALUES (\"{gene}\");\n")
+            f.write("SET @gene_id = (SELECT LAST_INSERT_ID());\n")
+
             for status, txs in data[gene].items():
                 if status == "clinical_transcript":
                     tx, source = txs
-                    f.write(f"{gene}\t{tx}\t{source}\n")
+                    tx_base, tx_version = tx.split(".")
+                    f.write((
+                        "INSERT INTO transcript (transcript, version, canonical) "
+                        f"VALUES (\"{tx_base}\", \"{tx_version}\", 0);\n"
+                    ))
+                    f.write("SET @transcript_id = (SELECT LAST_INSERT_ID());\n")
+                    f.write((
+                        "INSERT INTO genes2transcripts "
+                        "(clinical_transcript, date, gene_id, reference_id, transcript_id) "
+                        f"VALUES (1, \"{get_date_for_db()}\", @gene_id, 1, @transcript_id);\n"
+                    ))
+
                 else:
                     for tx in txs:
-                        f.write(f"{gene}\t{tx}\tNone\n")
+                        tx_base, tx_version = tx.split(".")
+                        f.write((
+                            "INSERT INTO transcript (transcript, version, canonical) "
+                            f"VALUES (\"{tx_base}\", \"{tx_version}\", 0);\n"
+                        ))
+                        f.write("SET @transcript_id = (SELECT LAST_INSERT_ID());\n")
+                        f.write((
+                            "INSERT INTO genes2transcripts "
+                            "(clinical_transcript, date, gene_id, reference_id, transcript_id) "
+                            f"VALUES (0, \"{get_date_for_db()}\", @gene_id, 1, @transcript_id);\n"
+                        ))
 
 
 def write_transcript_status(data):
