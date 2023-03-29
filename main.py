@@ -84,7 +84,7 @@ def main(args):
         data = transcript_assigner.assign_transcripts(
             session, meta, mane_select_data, g2t_data
         )
-        transcript_assigner.write_g2t(data, "g2t.tsv")
+        transcript_assigner.write_sql_queries(data, "g2t.sql")
         transcript_assigner.write_transcript_status(data)
     else:
         raise Exception(f"'{cmd}' is not a valid option")
