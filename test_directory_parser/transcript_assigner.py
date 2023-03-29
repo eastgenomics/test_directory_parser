@@ -17,7 +17,8 @@ def parse_mane_file(mane_file, hgnc_dump):
 
     with open(mane_file) as f:
         for line in f:
-            # each column has quotes around them so i'm striping them
+            # each column has quotes around them so i'm striping them i.e.
+            # "A1BG","MANE SELECT","ENST00000263100.8","NM_130786.4"
             cleaned_data = [ele.strip("\"") for ele in line.strip().split(",")]
             gene_symbol, mane_type, ensembl_38, refseq = cleaned_data[0:4]
 
@@ -33,7 +34,8 @@ def parse_mane_file(mane_file, hgnc_dump):
 
 
 def parse_gene_transcript(g2t_file):
-    """ Parse gene to transcripts file (2 columns file)
+    """ Parse gene to transcripts file (2 columns file) for missing genes in
+    the panel database
 
     Args:
         g2t_file (str): Path to the g2t file
@@ -87,6 +89,7 @@ def find_HGMD_transcript(session, meta, hgnc_id):
     elif len(hgmd_transcript) == 1:
         return hgmd_transcript[0]
     else:
+        # HGNC ids should only be linked to one HGMD transcript
         raise Exception(
             f"{hgnc_id} has the following transcripts in the HGMD database: "
             f"{', '.join(hgmd_transcript)}"
@@ -139,14 +142,16 @@ def assign_transcripts(session, meta, mane_select_data, g2t_data):
 
                 if tx_base == hgmd_base:
                     data[gene]["clinical_transcript"] = [tx, "HGMD"]
+                    continue
 
             data[gene]["no_clinical_transcript"].append(tx)
 
     return data
 
 
-def write_g2t(data, output_path):
-    """ Write g2t output
+def write_sql_queries(data, output_path):
+    """ Write SQL queries to run on the panel database to add genes and
+    transcripts output
 
     Args:
         data (dict): Dict of dict with the gene as key, status as subkey and
