@@ -84,7 +84,7 @@ There are 3 main modes for this script:
 
 ```bash
 # outputs a json containing cleaned data from the given test directory
-python main.py --hgnc ${hgnc_dump.txt} rare_disease ${test_directory.xslx} configs/${config} [-o ${output_path}]
+python main.py -c configs/${config} [-o ${output_path}] --hgnc ${hgnc_dump.txt} rare_disease ${test_directory.xslx} 
 ```
 
 - Check content of given test directory against panel database and output:
