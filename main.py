@@ -35,8 +35,8 @@ def main(args):
         print("Parsing of the cancer test directory is not implemented yet")
 
     elif cmd == "checker":
-        session, meta = utils.connect_to_panel_database(
-            args.username, args.passwd
+        session, meta = utils.connect_to_local_database(
+            args.username, args.passwd, args.database_name
         )
         td_parser_output = json.load(open(args.td_parser_output))
 
