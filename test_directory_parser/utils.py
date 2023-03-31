@@ -172,9 +172,17 @@ def handle_list_panels(panels, hgnc_dump, r_code):
                     else:
                         # we didn't manage to find a HGNC id for the gene
                         # symbol
+                        print(
+                            f"Couldn't find a HGNC id for '{panel}', please "
+                            "check manually"
+                        )
                         hgnc_ids.append(None)
             else:
                 # that element of the list is not a gene
+                print(
+                    f"This element '{panel}' was not detected as being a gene."
+                    " Please check manually"
+                )
                 hgnc_ids.append(None)
 
         return hgnc_ids
@@ -214,12 +222,13 @@ def extract_panelapp_id(panels):
 
     for panel in panels:
         # find the panelapp id in the panel name
-        match = regex.search(r"\([0-9]+\)", panel)
+        match = regex.findall(r"\([0-9]+\)", panel)
 
         if match:
-            # get the whole result and strip out the parentheses
-            result = match.group(0).strip("()")
-            panelapp_ids.append(result)
+            for m in match:
+                # get the whole result and strip out the parentheses
+                result = m.strip("()")
+                panelapp_ids.append(result)
         else:
             # it might be something like "(panelapp id & panelapp id)", true
             # story
