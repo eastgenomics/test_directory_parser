@@ -59,6 +59,15 @@ The `ngs_test_methods` field contains the test methods that we want to keep, so 
 }
 ```
 
+### MANE Select file
+
+Downloaded CSV from http://tark.ensembl.org/web/mane_GRCh37_list/
+
+### Input genes/transcripts file for transcript assigner
+
+File generated using outputs from the checker mode. Instructions here: https://cuhbioinformatics.atlassian.net/wiki/spaces/PPO/pages/2888204505/Test+directory+v5+April+2023#Check-what-transcripts-we-have-for-the-genes-that-need-to-be-added-in-the-database
+
+
 ## How to run
 
 Setup your environment first:
@@ -69,13 +78,13 @@ source ${path_to_env}/${env_name}/bin/activate
 pip install -r requirements.txt
 ```
 
-There are 2 main modes for this script:
+There are 3 main modes for this script:
 
 - Parse the test directory (only rare disease for now)
 
 ```bash
 # outputs a json containing cleaned data from the given test directory
-python main.py --hgnc ${hgnc_dump.txt} rare_disease ${test_directory.xslx} configs/${config} [-o ${output_path}]
+python main.py -c configs/${config} [-o ${output_path}] --hgnc ${hgnc_dump.txt} rare_disease ${test_directory.xslx} 
 ```
 
 - Check content of given test directory against panel database and output:
@@ -87,7 +96,17 @@ python main.py --hgnc ${hgnc_dump.txt} rare_disease ${test_directory.xslx} confi
 
 ```bash
 # output mandatory check files
-python main.py checker ${panel_database_username} ${panel_database_passwd} configs/${config}
+python main.py checker ${panel_database_username} ${panel_database_passwd} ${panel_database_name} ${JSON output of test directory parser}
 # output all the files
-python main.py checker ${panel_database_username} ${panel_database_passwd} configs/${config} -f ${filter_string}
+python main.py checker ${panel_database_username} ${panel_database_passwd} ${panel_database_name} ${JSON output of test directory parser} -f ${filter_string}
+```
+
+- Assign transcripts to given genes/transcripts file and MANE file and output:
+  - sql queries file
+  - genes with clinical transcript file
+  - genes with no clinical transcript file
+
+```bash
+# output sql queries file, genes with clinical transcripts file, genes with no clinical transcript file
+python main.py -hgnc hgnc_dump.txt transcript_assigner ${hgmd_database_username} ${hgmd_database_passwd} ${hgmd_database_name} ${gene_transcript_file} ${MANE_file}
 ```

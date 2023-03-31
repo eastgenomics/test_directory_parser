@@ -8,18 +8,19 @@ import pandas as pd
 import regex
 
 
-def connect_to_panel_database(user, passwd):
-    """ Return cursor of panel_database
+def connect_to_local_database(user, passwd, db):
+    """ Return cursor of database
     Args:
         user (str): Username for the database
         passwd (str): Password for the user
+        db (str): Database name to connect to
     Returns:
         tuple: SQLAlchemy session obj, SQLAlchemy meta obj
     """
 
     try:
         db = create_engine(
-            f"mysql://{user}:{passwd}@127.0.0.1/panel_database"
+            f"mysql://{user}:{passwd}@127.0.0.1/{db}"
         )
     except Exception as e:
         raise e
