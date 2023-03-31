@@ -180,6 +180,8 @@ def compare_panelapp_panels_content(
     panel_absent_genes = {}
     panel_no_clinical_transcripts = {}
 
+    panel_name_mismatch = {}
+
     all_absent_genes = set()
     all_no_clinical_transcripts = set()
 
@@ -191,6 +193,9 @@ def compare_panelapp_panels_content(
         if panels:
             # clinical indications can have multiple panels
             for panelapp_id in panels:
+                if not panelapp_id:
+                    raise Exception(f"Please check {code} for Nones")
+
                 # check if the target is a panelapp panel or single genes
                 if regex.search(r"^[0-9]+", panelapp_id):
                     # get the genes in the database
@@ -200,6 +205,12 @@ def compare_panelapp_panels_content(
 
                     # sense check to see if the panel id and the panel name
                     # match
+                    if int(panelapp_id) not in signedoff_panels:
+                        raise Exception(
+                            f"{panelapp_id} might be retired but is used for "
+                            f"{code}"
+                        )
+
                     panel = signedoff_panels[int(panelapp_id)]
                     cleaned_panel_name = panel.name.strip("(GMS)")\
                         .lower().strip()
@@ -208,10 +219,8 @@ def compare_panelapp_panels_content(
                         cleaned_panel_name not in 
                         indication["original_targets"].lower()
                     ):
-                        print(
-                            f"Warning: The panel id in the TD '{panelapp_id}' "
-                            f"doesn't match the name for {code}: {panel.name} "
-                            f"!= {indication['original_targets']}"
+                        panel_name_mismatch.setdefault(code, []).append(
+                            (indication['original_targets'], panel.name)
                         )
 
                     # get the green genes of panelapp panel
@@ -243,6 +252,24 @@ def compare_panelapp_panels_content(
                     all_no_clinical_transcripts.update(
                         no_clinical_transcripts
                     )
+
+    if panel_name_mismatch:
+        print(
+            "\nWarning: The panel name in the TD doesn't match the panel name "
+            "gathered in Panelapp for the following clinical indications. "
+            "Please double check that the names match as the wrong ID has "
+            "already been given to the wrong Panelapp panel in the past."
+        )
+
+        print("Clinical indication\tTD panel name\tPanelapp panel name")
+
+        for ci in panel_name_mismatch:
+            panels = panel_name_mismatch[ci]
+
+            for td_panel_name, panelapp_panel_name in panels:
+                print(
+                    f"{ci}\t{td_panel_name}\t{panelapp_panel_name}"
+                )
 
     return (
         panel_absent_genes, panel_no_clinical_transcripts,
