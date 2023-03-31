@@ -68,7 +68,7 @@ def main(args):
         output_checker.write_data(absent_genes, "genes_not_in_database.txt")
         output_checker.write_data(
             genes_no_clinical_transcripts,
-            "genes_with_no_clinical_transcripts.txt"
+            "genes_with_no_clinical_transcripts_in_database.txt"
         )
     elif cmd == "transcript_assigner":
         hgnc_data = utils.parse_tsv(args.hgnc)
