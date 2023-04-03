@@ -110,6 +110,16 @@ def find_hgnc_id(gene_symbol, hgnc_dump):
             elif len(df_previous_symbols) == 0 and len(df_alias_symbols) == 1:
                 # found only a alias symbol, return the HGNC id
                 return df_alias_symbols["HGNC ID"].to_list()[0]
+            elif len(df_previous_symbols) >= 1:
+                print(
+                    f"Found 2 or more previous symbols for '{gene_symbol}'. "
+                    "Please check manually"
+                )
+            elif len(df_alias_symbols) >= 1:
+                print(
+                    f"Found 2 or more alias symbols for '{gene_symbol}'. "
+                    "Please check manually"
+                )
             elif len(df_previous_symbols) >= 1 and len(df_alias_symbols) >= 1:
                 # found previous and alias symbols, cry
                 print(
@@ -172,9 +182,17 @@ def handle_list_panels(panels, hgnc_dump, r_code):
                     else:
                         # we didn't manage to find a HGNC id for the gene
                         # symbol
+                        print(
+                            f"Couldn't find a HGNC id for '{panel}', please "
+                            "check manually"
+                        )
                         hgnc_ids.append(None)
             else:
                 # that element of the list is not a gene
+                print(
+                    f"This element '{panel}' was not detected as being a gene."
+                    " Please check manually"
+                )
                 hgnc_ids.append(None)
 
         return hgnc_ids
@@ -214,12 +232,13 @@ def extract_panelapp_id(panels):
 
     for panel in panels:
         # find the panelapp id in the panel name
-        match = regex.search(r"\([0-9]+\)", panel)
+        match = regex.findall(r"\([0-9]+\)", panel)
 
         if match:
-            # get the whole result and strip out the parentheses
-            result = match.group(0).strip("()")
-            panelapp_ids.append(result)
+            for m in match:
+                # get the whole result and strip out the parentheses
+                result = m.strip("()")
+                panelapp_ids.append(result)
         else:
             # it might be something like "(panelapp id & panelapp id)", true
             # story

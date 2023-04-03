@@ -35,8 +35,8 @@ def main(args):
         print("Parsing of the cancer test directory is not implemented yet")
 
     elif cmd == "checker":
-        session, meta = utils.connect_to_panel_database(
-            args.username, args.passwd
+        session, meta = utils.connect_to_local_database(
+            args.username, args.passwd, args.database_name
         )
         td_parser_output = json.load(open(args.td_parser_output))
 
@@ -68,7 +68,7 @@ def main(args):
         output_checker.write_data(absent_genes, "genes_not_in_database.txt")
         output_checker.write_data(
             genes_no_clinical_transcripts,
-            "genes_with_no_clinical_transcripts.txt"
+            "genes_with_no_clinical_transcripts_in_database.txt"
         )
     elif cmd == "transcript_assigner":
         hgnc_data = utils.parse_tsv(args.hgnc)
