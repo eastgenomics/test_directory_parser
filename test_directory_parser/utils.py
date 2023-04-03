@@ -110,6 +110,16 @@ def find_hgnc_id(gene_symbol, hgnc_dump):
             elif len(df_previous_symbols) == 0 and len(df_alias_symbols) == 1:
                 # found only a alias symbol, return the HGNC id
                 return df_alias_symbols["HGNC ID"].to_list()[0]
+            elif len(df_previous_symbols) >= 1:
+                print(
+                    f"Found 2 or more previous symbols for '{gene_symbol}'. "
+                    "Please check manually"
+                )
+            elif len(df_alias_symbols) >= 1:
+                print(
+                    f"Found 2 or more alias symbols for '{gene_symbol}'. "
+                    "Please check manually"
+                )
             elif len(df_previous_symbols) >= 1 and len(df_alias_symbols) >= 1:
                 # found previous and alias symbols, cry
                 print(
