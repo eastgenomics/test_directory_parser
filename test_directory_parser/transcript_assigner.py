@@ -181,7 +181,7 @@ def write_sql_queries(data, output_path):
                     tx, source = txs
                     tx_base, tx_version = tx.split(".")
                     f.write((
-                        "INSERT INTO transcript (transcript, version, canonical) "
+                        "INSERT INTO transcript (refseq_base, version, canonical) "
                         f"VALUES (\"{tx_base}\", \"{tx_version}\", 0);\n"
                     ))
                     f.write("SET @transcript_id = (SELECT LAST_INSERT_ID());\n")
@@ -195,7 +195,7 @@ def write_sql_queries(data, output_path):
                     for tx in txs:
                         tx_base, tx_version = tx.split(".")
                         f.write((
-                            "INSERT INTO transcript (transcript, version, canonical) "
+                            "INSERT INTO transcript (refseq_base, version, canonical) "
                             f"VALUES (\"{tx_base}\", \"{tx_version}\", 0);\n"
                         ))
                         f.write("SET @transcript_id = (SELECT LAST_INSERT_ID());\n")
