@@ -175,6 +175,10 @@ def write_sql_queries(data, output_path):
         for gene in data:
             f.write(f"INSERT INTO gene (hgnc_id) VALUES (\"{gene}\");\n")
             f.write("SET @gene_id = (SELECT LAST_INSERT_ID());\n")
+            f.write(
+                f"INSERT INTO feature (gene_id, feature_type_id) "
+                "VALUES (@gene_id, 1);\n"
+            )
 
             for status, txs in data[gene].items():
                 if status == "clinical_transcript":
