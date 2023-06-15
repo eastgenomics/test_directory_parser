@@ -58,6 +58,7 @@ class TestDirectory:
             self.all_clinical_indications.append(ci)
 
     def output_json(self, output):
+        td = self.td
         source = self.config["name"]
         date = utils.get_date()
 
@@ -73,7 +74,8 @@ class TestDirectory:
         ]
 
         data = {
-            "source": source, "date": date, "indications": indications
+            "td_source": td, "config_source": source, "date": date,
+            "indications": indications
         }
 
         with open(output, "w") as f:
