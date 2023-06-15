@@ -20,12 +20,8 @@ def main(args):
             output = f"{date}_RD_TD.json"
 
         hgnc_data = utils.parse_tsv(args.hgnc)
-        config_data = rare_disease.parse_config(args.config)
-        sheet, change_column = rare_disease.parse_rare_disease_td(
-            args.test_directory, config_data
-        )
         rd_test_directory = test_directory.TestDirectory(
-            sheet, change_column, config_data, "rare_disease", hgnc_data
+            args.test_directory, args.config, "rare_disease", hgnc_data
         )
         rd_test_directory.setup_clinical_indications()
         rd_test_directory.output_json(output)
