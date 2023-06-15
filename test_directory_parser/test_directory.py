@@ -1,15 +1,24 @@
 import json
+from pathlib import Path
 
 from test_directory_parser import clinical_indication
+from test_directory_parser import rare_disease
 from test_directory_parser import utils
 
 
 class TestDirectory:
-    def __init__(self, dataframe, change_column, config, td_type, hgnc_dump):
-        self.data = dataframe.to_dict()
+    def __init__(
+            self, test_directory_path, config_path, td_type,hgnc_dump
+        ):
+        config_data = rare_disease.parse_config(config_path)
+        sheet, change_column = rare_disease.parse_rare_disease_td(
+            test_directory_path, config_data
+        )
+        self.data = sheet.to_dict()
+        self.td = Path(test_directory_path).name
         self.type = td_type
         self.change_column = change_column
-        self.config = config
+        self.config = config_data
         self.all_clinical_indications = []
         self.ngs_clinical_indications = []
         self.hgnc_dump = hgnc_dump
