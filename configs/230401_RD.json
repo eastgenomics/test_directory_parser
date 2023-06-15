@@ -14,6 +14,6 @@
         "Single gene testing (<10 amplicons)", "small panel", "Small panel",
         "Small panel - deep sequencing", "WES or Large panel", "WES or Large Panel",
         "WES or Large penel", "WES or Medium panel", "WES or Medium Panel",
-        "WES or Small Panel", "WGS"
+        "WES or Small Panel", "WGS", "WES"
     ]
 }
