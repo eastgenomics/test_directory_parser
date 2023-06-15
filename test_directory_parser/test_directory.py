@@ -62,16 +62,24 @@ class TestDirectory:
         source = self.config["name"]
         date = utils.get_date()
 
-        # we only output clinical indications that the lab will handle
-        indications = [
-            {
+        indications = []
+
+        for ci in self.ngs_clinical_indications:
+            # we only output clinical indications that the lab will handle
+            indication = {
                 "name": ci.name, "code": ci.r_code,
                 "gemini_name": ci.gemini_name, "test_method": ci.test_method,
                 "panels": ci.panels, "original_targets": ci.original_targets,
                 "changes": ci.change
             }
-            for ci in self.ngs_clinical_indications
-        ]
+
+            if ci.panels is None:
+                print((
+                    f"Check {ci.r_code} to see if the it is normal for the "
+                    "clinical indication to have None"
+                ))
+
+            indications.append(indication)
 
         data = {
             "td_source": td, "config_source": source, "date": date,
