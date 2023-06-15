@@ -73,10 +73,10 @@ class TestDirectory:
                 "changes": ci.change
             }
 
-            if ci.panels is None:
+            if ci.panels is None or None in ci.panels:
                 print((
-                    f"Check {ci.r_code} to see if the it is normal for the "
-                    "clinical indication to have None"
+                    f"Check {ci.r_code} why the target is None: "
+                    f"{ci.original_targets}"
                 ))
 
             indications.append(indication)
