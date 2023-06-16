@@ -1,15 +1,24 @@
 import json
+from pathlib import Path
 
 from test_directory_parser import clinical_indication
+from test_directory_parser import rare_disease
 from test_directory_parser import utils
 
 
 class TestDirectory:
-    def __init__(self, dataframe, change_column, config, td_type, hgnc_dump):
-        self.data = dataframe.to_dict()
+    def __init__(
+            self, test_directory_path, config_path, td_type, hgnc_dump
+        ):
+        config_data = rare_disease.parse_config(config_path)
+        sheet, change_column = rare_disease.parse_rare_disease_td(
+            test_directory_path, config_data
+        )
+        self.data = sheet.to_dict()
+        self.td = Path(test_directory_path).name
         self.type = td_type
         self.change_column = change_column
-        self.config = config
+        self.config = config_data
         self.all_clinical_indications = []
         self.ngs_clinical_indications = []
         self.hgnc_dump = hgnc_dump
@@ -49,22 +58,33 @@ class TestDirectory:
             self.all_clinical_indications.append(ci)
 
     def output_json(self, output):
+        print("\nOutputting json file..\n")
+        td = self.td
         source = self.config["name"]
         date = utils.get_date()
 
-        # we only output clinical indications that the lab will handle
-        indications = [
-            {
+        indications = []
+
+        for ci in self.ngs_clinical_indications:
+            # we only output clinical indications that the lab will handle
+            indication = {
                 "name": ci.name, "code": ci.r_code,
                 "gemini_name": ci.gemini_name, "test_method": ci.test_method,
                 "panels": ci.panels, "original_targets": ci.original_targets,
                 "changes": ci.change
             }
-            for ci in self.ngs_clinical_indications
-        ]
+
+            if ci.panels is None or None in ci.panels:
+                print((
+                    f"Check {ci.r_code} for why the target is or contains "
+                    f"None: {ci.original_targets}"
+                ))
+
+            indications.append(indication)
 
         data = {
-            "source": source, "date": date, "indications": indications
+            "td_source": td, "config_source": source, "date": date,
+            "indications": indications
         }
 
         with open(output, "w") as f:

@@ -7,7 +7,6 @@ from test_directory_parser import rare_disease
 from test_directory_parser import utils
 from test_directory_parser import test_directory
 from test_directory_parser import output_checker
-from test_directory_parser import transcript_assigner
 
 
 def main(args):
@@ -21,12 +20,8 @@ def main(args):
             output = f"{date}_RD_TD.json"
 
         hgnc_data = utils.parse_tsv(args.hgnc)
-        config_data = rare_disease.parse_config(args.config)
-        sheet, change_column = rare_disease.parse_rare_disease_td(
-            args.test_directory, config_data
-        )
         rd_test_directory = test_directory.TestDirectory(
-            sheet, change_column, config_data, "rare_disease", hgnc_data
+            args.test_directory, args.config, "rare_disease", hgnc_data
         )
         rd_test_directory.setup_clinical_indications()
         rd_test_directory.output_json(output)
@@ -70,22 +65,6 @@ def main(args):
             genes_no_clinical_transcripts,
             "genes_with_no_clinical_transcripts_in_database.txt"
         )
-    elif cmd == "transcript_assigner":
-        hgnc_data = utils.parse_tsv(args.hgnc)
-        session, meta = utils.connect_to_local_database(
-            args.username, args.passwd, args.database_name
-        )
-        mane_select_data = transcript_assigner.parse_mane_file(
-            args.mane_select, hgnc_data
-        )
-        g2t_data = transcript_assigner.parse_gene_transcript(
-            args.gene_transcript
-        )
-        data = transcript_assigner.assign_transcripts(
-            session, meta, mane_select_data, g2t_data
-        )
-        transcript_assigner.write_sql_queries(data, "g2t.sql")
-        transcript_assigner.write_transcript_status(data)
     else:
         raise Exception(f"'{cmd}' is not a valid option")
 
@@ -121,24 +100,6 @@ if __name__ == "__main__":
         "-f", "--filter", help="Filter option on the change column"
     )
     checker_parser.set_defaults(which="checker")
-
-    transcript_parser = subparsers.add_parser("transcript_assigner")
-    transcript_parser.add_argument(
-        "username", help="Username for the HGMD database"
-    )
-    transcript_parser.add_argument(
-        "passwd", help="Password for given username"
-    )
-    transcript_parser.add_argument(
-        "database_name", help="Name of the HGMD database"
-    )
-    transcript_parser.add_argument(
-        "gene_transcript", help="File containing genes and their transcripts"
-    )
-    transcript_parser.add_argument(
-        "mane_select", help="File containing the MANE select data"
-    )
-    transcript_parser.set_defaults(which="transcript_assigner")
 
     parser.add_argument(
         "-c", "--config",
