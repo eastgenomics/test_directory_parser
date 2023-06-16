@@ -58,6 +58,7 @@ class TestDirectory:
             self.all_clinical_indications.append(ci)
 
     def output_json(self, output):
+        print("\nOutputting json file..\n")
         td = self.td
         source = self.config["name"]
         date = utils.get_date()
