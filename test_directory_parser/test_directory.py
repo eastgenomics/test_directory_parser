@@ -75,8 +75,8 @@ class TestDirectory:
 
             if ci.panels is None or None in ci.panels:
                 print((
-                    f"Check {ci.r_code} why the target is None: "
-                    f"{ci.original_targets}"
+                    f"Check {ci.r_code} for why the target is or contains "
+                    f"None: {ci.original_targets}"
                 ))
 
             indications.append(indication)
