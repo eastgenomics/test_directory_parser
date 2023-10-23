@@ -3,7 +3,6 @@ import json
 
 from panelapp import queries
 
-from test_directory_parser import rare_disease
 from test_directory_parser import utils
 from test_directory_parser import test_directory
 from test_directory_parser import output_checker
@@ -24,6 +23,11 @@ def main(args):
             args.test_directory, args.config, "rare_disease", hgnc_data
         )
         rd_test_directory.setup_clinical_indications()
+
+        if args.lab_excel:
+            lab_df = utils.parse_lab_excel(args.lab_excel)
+            rd_test_directory.filter_clinical_indications(lab_df)
+
         rd_test_directory.output_json(output)
 
     elif cmd == "cancer":
@@ -76,6 +80,13 @@ if __name__ == "__main__":
     rare_disease_parser = subparsers.add_parser("rare_disease")
     rare_disease_parser.add_argument(
         "test_directory", help="Path to test directory"
+    )
+    rare_disease_parser.add_argument(
+        "-lab_excel", "--lab_excel",
+        help=(
+            "Excel file containing the clinical indications that the CUH lab "
+            "actually handles"
+        )
     )
     rare_disease_parser.set_defaults(which="rare_disease")
 
