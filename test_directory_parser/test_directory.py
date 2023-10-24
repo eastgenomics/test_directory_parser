@@ -37,6 +37,7 @@ class TestDirectory:
         self.config = config_data
         self.all_clinical_indications = []
         self.ngs_clinical_indications = []
+        self.filtered_clinical_indications = []
         self.hgnc_dump = hgnc_dump
 
     def setup_clinical_indications(self):
@@ -72,6 +73,30 @@ class TestDirectory:
                 self.ngs_clinical_indications.append(ci)
 
             self.all_clinical_indications.append(ci)
+
+    def filter_clinical_indications(self, internal_td: pd.DataFrame):
+        """ Filter the gathered clinical indications using the internal test
+        directory
+
+        Args:
+            internal_td (pd.DataFrame): Dataframe containing the internal test
+            directory data
+        """
+
+        for clinical_indication in self.ngs_clinical_indications:
+            filtered_df = internal_td[
+                internal_td["Clinical Indication"] == clinical_indication
+            ]
+
+            if filtered_df.shape[0] != 0:
+                self.filtered_clinical_indications.append(clinical_indication)
+
+        assert (
+            len(self.filtered_clinical_indications) == internal_td.shape[0]
+        ), (
+            "Did not found every test from the internal test directory in the "
+            "new test directory"
+        )
 
     def output_json(self, output: str):
         """ Output the content of the test directory object as a JSON file
