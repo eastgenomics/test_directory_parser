@@ -85,7 +85,7 @@ class TestDirectory:
 
         for clinical_indication in self.ngs_clinical_indications:
             filtered_df = internal_td[
-                internal_td["Clinical Indication"] == clinical_indication
+                internal_td["Test ID"] == clinical_indication.r_code
             ]
 
             if filtered_df.shape[0] != 0:
@@ -117,11 +117,11 @@ class TestDirectory:
             indication = {
                 "name": ci.name, "code": ci.r_code,
                 "gemini_name": ci.gemini_name, "test_method": ci.test_method,
-                "panels": ci.panels, "original_targets": ci.original_targets,
-                "changes": ci.change
+                "panels": ci.panels + ci.genes,
+                "original_targets": ci.original_targets, "changes": ci.change
             }
 
-            if ci.panels is None or None in ci.panels:
+            if None in indication["panels"]:
                 print((
                     f"Check {ci.r_code} for why the target is or contains "
                     f"None: {ci.original_targets}"
