@@ -66,3 +66,5 @@ class ClinicalIndication:
 
                 if hgnc_id_data["HGNC ID"]:
                     self.genes.append(hgnc_id_data["HGNC ID"])
+                else:
+                    self.genes.append(None)
