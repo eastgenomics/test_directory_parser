@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+import pandas as pd
+
 from test_directory_parser import clinical_indication
 from test_directory_parser import rare_disease
 from test_directory_parser import utils
@@ -8,12 +10,26 @@ from test_directory_parser import utils
 
 class TestDirectory:
     def __init__(
-        self, test_directory_path, config_path, td_type, hgnc_dump
+        self, test_directory_path: str, config_path: str, td_type: str,
+        hgnc_dump: pd.DataFrame
     ):
+        """ Setup the test directory object with its clinical indications
+
+        Args:
+            test_directory_path (str): Path to the test directory
+            config_path (str): Path to the config file for parsing the test
+            directory
+            td_type (str): Type of the test directory i.e. rare disease, cancer
+            hgnc_dump (pd.DataFrame): Dataframe containing the HGNC data for
+            symbols conversion
+        """
+
         config_data = rare_disease.parse_config(config_path)
         sheet, change_column = rare_disease.parse_rare_disease_td(
             test_directory_path, config_data
         )
+
+        # convert the dataframe to a dictionary
         self.data = sheet.to_dict()
         self.td = Path(test_directory_path).name
         self.type = td_type
@@ -24,7 +40,7 @@ class TestDirectory:
         self.hgnc_dump = hgnc_dump
 
     def setup_clinical_indications(self):
-        """ Setup the clinical indications """
+        """ Go through the test directory and create clinical indications """
 
         r_codes = self.data[
             self.config["clinical_indication_column_code"]
@@ -57,7 +73,13 @@ class TestDirectory:
 
             self.all_clinical_indications.append(ci)
 
-    def output_json(self, output):
+    def output_json(self, output: str):
+        """ Output the content of the test directory object as a JSON file
+
+        Args:
+            output (str): Path to the output
+        """
+
         print("\nOutputting json file..\n")
         td = self.td
         source = self.config["name"]
