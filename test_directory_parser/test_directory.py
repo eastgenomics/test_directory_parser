@@ -112,7 +112,12 @@ class TestDirectory:
 
         indications = []
 
-        for ci in self.ngs_clinical_indications:
+        if self.filtered_clinical_indications:
+            clinical_indications = self.filtered_clinical_indications
+        else:
+            clinical_indications = self.ngs_clinical_indications
+
+        for ci in clinical_indications:
             # we only output clinical indications that the lab will handle
             indication = {
                 "name": ci.name, "code": ci.r_code,
