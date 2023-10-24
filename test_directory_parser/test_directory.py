@@ -8,8 +8,8 @@ from test_directory_parser import utils
 
 class TestDirectory:
     def __init__(
-            self, test_directory_path, config_path, td_type, hgnc_dump
-        ):
+        self, test_directory_path, config_path, td_type, hgnc_dump
+    ):
         config_data = rare_disease.parse_config(config_path)
         sheet, change_column = rare_disease.parse_rare_disease_td(
             test_directory_path, config_data
