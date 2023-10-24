@@ -8,7 +8,7 @@ import pandas as pd
 import regex
 
 
-def connect_to_local_database(user, passwd, db):
+def connect_to_local_database(user: str, passwd: str, db: str):
     """ Return cursor of database
     Args:
         user (str): Username for the database
@@ -42,19 +42,38 @@ def get_date():
     return datetime.datetime.now().strftime("%y%m%d")
 
 
-def parse_tsv(tsv):
+def parse_tsv(tsv: str):
+    """ Parse any TSV given using Pandas
+
+    Args:
+        tsv (str): Path to the TSV file to parse
+
+    Returns:
+        pd.DataFrame: Dataframe containing the TSV data without Nones
+    """
+
     df = pd.read_csv(tsv, delimiter="\t")
     # replace NA by None so that we can handle them
     df_with_none = df.where(pd.notnull(df), None)
     return df_with_none
 
 
-def parse_lab_excel(excel_file):
+def parse_lab_excel(excel_file: str):
+    """ Parse the internal test directory and get rows only with CEN and WES
+
+    Args:
+        excel_file (str): Path to the excel file
+
+    Returns:
+        pd.DataFrame: Dataframe filtered on the NGS Technology column to
+        contain only CEN and WES
+    """
+
     df = pd.read_excel(excel_file)
     return df[df["NGS Technology"].isin(["CEN", "WES"])]
 
 
-def find_hgnc_id(gene_symbol, hgnc_dump):
+def find_hgnc_id(gene_symbol: str, hgnc_dump: pd.DataFrame) -> pd.DataFrame:
     """ Find hgnc id using the hgnc dump
 
     Args:
@@ -65,7 +84,8 @@ def find_hgnc_id(gene_symbol, hgnc_dump):
         Exception: if a panel has escaped previous checks
 
     Returns:
-        str: Hgnc id
+        pd.DataFrame: Dataframe for the given gene and whether the code had to
+        look in the alias or previous columns to solve the symbol
     """
 
     df_res = pd.Series(
@@ -110,8 +130,12 @@ def find_hgnc_id(gene_symbol, hgnc_dump):
             )
             # go back to a dataframe using the numpy array to get the matching
             # rows
-            df_previous_symbols = previous_symbols.loc[previous_symbols_match.any(axis=1)]
-            df_alias_symbols = alias_symbols.loc[alias_symbols_match.any(axis=1)]
+            df_previous_symbols = previous_symbols.loc[
+                previous_symbols_match.any(axis=1)
+            ]
+            df_alias_symbols = alias_symbols.loc[
+                alias_symbols_match.any(axis=1)
+            ]
 
             # check the size of the dataframes and do the appropriate action
             if len(df_previous_symbols) == 0 and len(df_alias_symbols) == 0:
