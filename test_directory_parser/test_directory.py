@@ -32,7 +32,7 @@ class TestDirectory:
         # convert the dataframe to a dictionary
         self.data = sheet.to_dict()
         self.td = Path(test_directory_path).name
-        self.type = td_type
+        self.td_type = td_type
         self.change_column = change_column
         self.config = config_data
         self.all_clinical_indications = []
