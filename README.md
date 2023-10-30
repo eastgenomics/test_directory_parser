@@ -1,5 +1,7 @@
 # test_directory_parser
-Script(s) to parse the test directories
+Script(s) to parse the test directories.
+
+These test directories have gone through a checking phase using https://github.com/eastgenomics/test_directory_checker
 
 ## Before running the code
 
@@ -30,7 +32,7 @@ Right now this version of the code can only be used to parse the rare disease te
 
 ### Config file
 
-The config file is used to indicated the header line, the name of the sheet of interest and the name of the columns that need to be gathered and processed.
+The config file is used to indicate the header line, the name of the sheet of interest and the name of the columns that need to be gathered and processed.
 
 Right now the columns containing the test code, clinical indication name, test methods and the targets columns are processed without addition of code.
 
@@ -101,3 +103,5 @@ The code will output a JSON file with the following default name `${YYMMDD}_RD_T
     }
 }
 ```
+
+This output is than used to import this data into the panel database using panel_ops (https://github.com/eastgenomics/panel_ops).
