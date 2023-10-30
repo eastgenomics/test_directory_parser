@@ -1,5 +1,7 @@
 # test_directory_parser
-Script(s) to parse the test directories
+Script(s) to parse the test directories.
+
+These test directories have gone through a checking phase using https://github.com/eastgenomics/test_directory_checker
 
 ## Before running the code
 
@@ -30,7 +32,7 @@ Right now this version of the code can only be used to parse the rare disease te
 
 ### Config file
 
-The config file is used to indicated the header line, the name of the sheet of interest and the name of the columns that need to be gathered and processed.
+The config file is used to indicate the header line, the name of the sheet of interest and the name of the columns that need to be gathered and processed.
 
 Right now the columns containing the test code, clinical indication name, test methods and the targets columns are processed without addition of code.
 
@@ -68,25 +70,38 @@ pip install -r requirements.txt
 
 ## How to run
 
-There are 3 main modes for this script:
-
-- Parse the test directory (only rare disease for now)
-
 ```bash
 # outputs a json containing cleaned data from the given test directory
 python main.py -c configs/${config} [-o ${output_path}] --hgnc ${hgnc_dump.txt} rare_disease ${test_directory.xslx} 
 ```
 
-- Check content of given test directory against panel database and output:
-  - absent_genes_per_panel.txt: TSV with clinical indications and the potential genes that are absent from the database
-  - no_clinical_transcript_per_clinical_indication.txt: TSV with clinical indications and the genes that don't have clinical transcripts
-  - absent_genes_per_panel.txt: Text file with all genes that need to be added in the database (removes some duplicates)
-  - genes_with_no_clinical_transcripts.txt: Text file with all genes that have no clinical transcripts in the database
-  - (optional) clinical_indication_with_${string_filter}.txt: Text file with clinical indication codes filtered on the change column using a string filter
+## Output
 
-```bash
-# output mandatory check files
-python main.py checker ${panel_database_username} ${panel_database_passwd} ${panel_database_name} ${JSON output of test directory parser}
-# output all the files
-python main.py checker ${panel_database_username} ${panel_database_passwd} ${panel_database_name} ${JSON output of test directory parser} -f ${filter_string}
+The code will output a JSON file with the following default name `${YYMMDD}_RD_TD.json` with the following format:
+
+```json
+{
+  "td_source": "",
+  "config_source": "",
+  "date": "",
+  "indications": [
+    {
+      "name": "",
+      "code": "",
+      "gemini_name": "",
+      "test_method": "",
+      "panels": [
+        ""
+      ],
+      "original_targets": "",
+      "changes": ""
+    },
+    {
+      .
+      .
+      .
+    }
+}
 ```
+
+This output is than used to import this data into the panel database using panel_ops (https://github.com/eastgenomics/panel_ops).

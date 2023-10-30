@@ -3,7 +3,7 @@ import json
 import pandas as pd
 
 
-def parse_config(config):
+def parse_config(config: str):
     """ Parse config file
 
     Args:
@@ -19,7 +19,7 @@ def parse_config(config):
     return config_data
 
 
-def parse_rare_disease_td(test_directory, config):
+def parse_rare_disease_td(test_directory: str, config: str):
     """Parse rare disease test directory using the config file
 
     Args:

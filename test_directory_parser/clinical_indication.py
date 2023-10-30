@@ -1,10 +1,26 @@
+import pandas as pd
 import regex
 
 from test_directory_parser import utils
 
 
 class ClinicalIndication:
-    def __init__(self, r_code, name, panels, test_method, change, hgnc_dump):
+    def __init__(
+        self, r_code: str, name: str, target: str, test_method: str,
+        change: str, hgnc_dump: pd.DataFrame
+    ):
+        """ Setup the clinical indication object
+
+        Args:
+            r_code (str): R code associated with the clinical indication
+            name (str): Name of the clinical indication
+            target (str): Target of the clinical indication
+            test_method (str): Test method of the clinical indication
+            change (str): Changes described in the test directory excel i.e.
+            no changes, addition of, removal of ...
+            hgnc_dump (pd.DataFrame): Dataframe containing the HGNC data
+        """
+
         self.r_code = r_code
         # R424 has a space at the end of its name
         self.name = name.replace("–", "-").strip()
@@ -14,84 +30,41 @@ class ClinicalIndication:
         else:
             self.gemini_name = f"{self.r_code}_{self.name}_P"
 
-        self.original_targets = panels
-        self.panels = None
+        self.original_targets = target
         self.test_method = test_method
         self.change = change
-        self.clean_panels(hgnc_dump)
+        self.clean_target(hgnc_dump)
 
-    def clean_panels(self, hgnc_dump):
+    def clean_target(self, hgnc_dump: pd.DataFrame):
         """ Attempt to clean up the targets in the excel file
 
         Args:
             hgnc_dump (pandas.Dataframe): Dataframe of hgnc data
         """
 
-        # stupid weird dash that needs replacing
-        panels = self.original_targets.replace("–", "-")
-        panels_comma = [p.strip() for p in panels.split(",")]
-        panels_semicolon = [p.strip() for p in panels.split(";")]
+        self.panels = []
+        self.genes = []
 
-        if panels_comma == panels_semicolon:
-            # regex to identify panelapp panels
-            if regex.match(
-                r"[A-Za-z0-9-()\ ]*\([0-9&\ ]+\)", panels_comma[0]
-            ):
-                self.panels = utils.extract_panelapp_id(panels_comma)
-                return
+        potential_panel_targets = regex.findall(
+            r"\([0-9&\ ]+\)", self.original_targets
+        )
+        potential_gene_targets = regex.findall(
+            r"[A-Z]+[A-Z0-9\-]+", self.original_targets
+        )
 
-            # regex to identify gene symbol
-            if regex.match(r"[A-Z]+[A-Z0-9]+", panels_comma[0]):
-                hgnc_id = utils.find_hgnc_id(panels_comma[0], hgnc_dump)
+        # regex to identify panelapp panels
+        if potential_panel_targets:
+            for potential_panel in potential_panel_targets:
+                cleaned_panelapp_id = potential_panel.replace(
+                    "(", "").replace(")", "")
+                self.panels.append(cleaned_panelapp_id)
 
-                if hgnc_id:
-                    self.panels = [hgnc_id]
+        # regex to identify gene symbol
+        elif potential_gene_targets:
+            for potential_gene in potential_gene_targets:
+                hgnc_id_data = utils.find_hgnc_id(potential_gene, hgnc_dump)
 
-                return
-
-            # regex to identify the rest
-            if regex.match(r"[A-Za-z\ ]", panels_comma[0]):
-                return
-
-        else:
-            if len(panels_comma) == 1:
-                # try and rescue some panelapp panels
-                if regex.match(
-                    r"[A-Za-z0-9-()\ ,]*\([0-9]+\)", panels_comma[0]
-                ):
-                    self.panels = utils.extract_panelapp_id(panels_comma)
-                    return
+                if hgnc_id_data["HGNC ID"]:
+                    self.genes.append(hgnc_id_data["HGNC ID"])
                 else:
-                    # assume that we have lists of genes using semicolon
-                    pass
-                    # print("assume lists of gene semicolon", panels_comma)
-
-            elif len(panels_comma) >= 2:
-                cleaned_panels = utils.handle_list_panels(
-                    panels_comma, hgnc_dump, self.r_code
-                )
-
-                if cleaned_panels:
-                    self.panels = cleaned_panels
-                return
-
-            if len(panels_semicolon) == 1:
-                # try and rescue some panelapp panels
-                if regex.match(
-                    r"[A-Za-z0-9-()\ ,]*\([0-9]+\)", panels_semicolon[0]
-                ):
-                    self.panels = utils.extract_panelapp_id(panels_semicolon)
-                    return
-                else:
-                    # assume that we have lists of genes not using comma
-                    # print("assume lists of gene comma", panels_semicolon)
-                    pass
-
-            elif len(panels_semicolon) >= 2:
-                cleaned_panels = utils.handle_list_panels(
-                    panels_semicolon, hgnc_dump, self.r_code
-                )
-
-                if cleaned_panels:
-                    self.panels = cleaned_panels
-                return
+                    self.genes.append(None)

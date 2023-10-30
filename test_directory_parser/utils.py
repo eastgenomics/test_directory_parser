@@ -8,7 +8,7 @@ import pandas as pd
 import regex
 
 
-def connect_to_local_database(user, passwd, db):
+def connect_to_local_database(user: str, passwd: str, db: str):
     """ Return cursor of database
     Args:
         user (str): Username for the database
@@ -42,14 +42,38 @@ def get_date():
     return datetime.datetime.now().strftime("%y%m%d")
 
 
-def parse_tsv(tsv):
+def parse_tsv(tsv: str):
+    """ Parse any TSV given using Pandas
+
+    Args:
+        tsv (str): Path to the TSV file to parse
+
+    Returns:
+        pd.DataFrame: Dataframe containing the TSV data without Nones
+    """
+
     df = pd.read_csv(tsv, delimiter="\t")
     # replace NA by None so that we can handle them
     df_with_none = df.where(pd.notnull(df), None)
     return df_with_none
 
 
-def find_hgnc_id(gene_symbol, hgnc_dump):
+def parse_lab_excel(excel_file: str):
+    """ Parse the internal test directory and get rows only with CEN and WES
+
+    Args:
+        excel_file (str): Path to the excel file
+
+    Returns:
+        pd.DataFrame: Dataframe filtered on the NGS Technology column to
+        contain only CEN and WES
+    """
+
+    df = pd.read_excel(excel_file)
+    return df[df["NGS Technology"].isin(["CEN", "WES"])]
+
+
+def find_hgnc_id(gene_symbol: str, hgnc_dump: pd.DataFrame) -> pd.DataFrame:
     """ Find hgnc id using the hgnc dump
 
     Args:
@@ -60,8 +84,17 @@ def find_hgnc_id(gene_symbol, hgnc_dump):
         Exception: if a panel has escaped previous checks
 
     Returns:
-        str: Hgnc id
+        pd.DataFrame: Dataframe for the given gene and whether the code had to
+        look in the alias or previous columns to solve the symbol
     """
+
+    df_res = pd.Series(
+        [gene_symbol, None, None, None], index=[
+            "Gene symbol", "HGNC ID", "Previous", "Alias"
+        ]
+    )
+
+    hgnc_id = None
 
     # pattern is the gene symbol and only the gene symbol
     pattern = fr"^{gene_symbol}$"
@@ -97,159 +130,46 @@ def find_hgnc_id(gene_symbol, hgnc_dump):
             )
             # go back to a dataframe using the numpy array to get the matching
             # rows
-            df_previous_symbols = previous_symbols.loc[previous_symbols_match.any(axis=1)]
-            df_alias_symbols = alias_symbols.loc[alias_symbols_match.any(axis=1)]
+            df_previous_symbols = previous_symbols.loc[
+                previous_symbols_match.any(axis=1)
+            ]
+            df_alias_symbols = alias_symbols.loc[
+                alias_symbols_match.any(axis=1)
+            ]
 
             # check the size of the dataframes and do the appropriate action
             if len(df_previous_symbols) == 0 and len(df_alias_symbols) == 0:
                 # couldn't find a previous or alias symbol
-                return None
+                return df_res
+
             elif len(df_previous_symbols) == 1 and len(df_alias_symbols) == 0:
                 # found only a previous symbol, return the HGNC id
-                return df_previous_symbols["HGNC ID"].to_list()[0]
+                hgnc_id = df_previous_symbols["HGNC ID"].to_list()[0]
+                df_res.at["Previous"] = True
+                df_res.at["Alias"] = False
+
             elif len(df_previous_symbols) == 0 and len(df_alias_symbols) == 1:
                 # found only a alias symbol, return the HGNC id
-                return df_alias_symbols["HGNC ID"].to_list()[0]
-            elif len(df_previous_symbols) >= 1:
-                print(
-                    f"Found 2 or more previous symbols for '{gene_symbol}'. "
-                    "Please check manually"
-                )
-            elif len(df_alias_symbols) >= 1:
-                print(
-                    f"Found 2 or more alias symbols for '{gene_symbol}'. "
-                    "Please check manually"
-                )
+                hgnc_id = df_alias_symbols["HGNC ID"].to_list()[0]
+                df_res.at["Previous"] = False
+                df_res.at["Alias"] = True
+
             elif len(df_previous_symbols) >= 1 and len(df_alias_symbols) >= 1:
                 # found previous and alias symbols, cry
-                print(
-                    "Couldn't find a non ambiguous HGNC id for "
-                    f"'{gene_symbol}'"
-                )
+                df_res.at["Previous"] = True
+                df_res.at["Alias"] = True
 
-        # some panel escaped checks
-        else:
-            raise Exception(f"'{gene_symbol}' escaped checks")
+            elif len(df_previous_symbols) >= 1:
+                df_res.at["Previous"] = True
+                df_res.at["Alias"] = False
+
+            elif len(df_alias_symbols) >= 1:
+                df_res.at["Previous"] = False
+                df_res.at["Alias"] = True
+
     else:
-        return data.iloc[0]
+        hgnc_id = data.iloc[0]
 
+    df_res.at["HGNC ID"] = hgnc_id
 
-def handle_list_panels(panels, hgnc_dump, r_code):
-    """ Given a list of "panels", get the hgnc ids/rescue comma panelapp panels
-
-    Args:
-        panels (list): List of panels
-        hgnc_dump (pd.Dataframe): Hgnc dump dataframe
-        r_code (str): R code
-
-    Returns:
-        list: List of hgnc ids/panel
-    """
-
-    hgnc_ids = []
-
-    # check if the list only contains genes
-    # check that the first element has a gene structure i.e. it's
-    # not something weird
-    if regex.match(r"[A-Z]+[A-Z0-9]+", panels[0]):
-        # first element is a gene, so assume that we're dealing with genes
-        for panel in panels:
-            # for every element in the list, double check that it is a gene
-            # because of test directory unpredictableness
-            if regex.match(r"[A-Z]+[A-Z0-9]+", panel):
-                hgnc_id = find_hgnc_id(panel, hgnc_dump)
-
-                if hgnc_id:
-                    hgnc_ids.append(hgnc_id)
-                else:
-                    # there are instances where the targets can include "and"
-                    # at the end of a gene list.
-                    # try and catch those instances
-                    if "and" in panel:
-                        attempt_rescue_gene = [
-                            gene.strip() for gene in panel.split("and")
-                        ]
-
-                        # check if there were 2 genes from each side of the 'and'
-                        if len(attempt_rescue_gene) >= 2:
-                            for gene in attempt_rescue_gene:
-                                rescued_gene = find_hgnc_id(gene, hgnc_dump)
-
-                                if rescued_gene:
-                                    hgnc_ids.append(rescued_gene)
-                                else:
-                                    hgnc_ids.append(None)
-                    else:
-                        # we didn't manage to find a HGNC id for the gene
-                        # symbol
-                        print(
-                            f"Couldn't find a HGNC id for '{panel}', please "
-                            "check manually"
-                        )
-                        hgnc_ids.append(None)
-            else:
-                # that element of the list is not a gene
-                print(
-                    f"This element '{panel}' was not detected as being a gene."
-                    " Please check manually"
-                )
-                hgnc_ids.append(None)
-
-        return hgnc_ids
-    else:
-        # do regex to see if every element in the list is a panel
-        matches = [
-            regex.match(r"[A-Za-z0-9-()\ ,]*\([0-9&\ ]+\)", panel)
-            for panel in panels
-        ]
-
-        if all(matches):
-            # all the elements are panelapp panels
-            return extract_panelapp_id(panels)
-        else:
-            # working on it, i realised that trying to rescue the potential
-            # panelapp panels is not trivial at all i.e. what if the panel has
-            # multiple commas
-            # so i think it's safer to manual rescue them
-            print(
-                f"'{r_code}' has the following potential panelapp panels "
-                f"with commas '{panels}'"
-            )
-            return None
-
-
-def extract_panelapp_id(panels):
-    """ Extract the panelapp id from the target in the test directory
-
-    Args:
-        panels (iter): Iterable containing the panels to look at
-
-    Returns:
-        list: List of panelapp ids
-    """
-
-    panelapp_ids = []
-
-    for panel in panels:
-        # find the panelapp id in the panel name
-        match = regex.findall(r"\([0-9]+\)", panel)
-
-        if match:
-            for m in match:
-                # get the whole result and strip out the parentheses
-                result = m.strip("()")
-                panelapp_ids.append(result)
-        else:
-            # it might be something like "(panelapp id & panelapp id)", true
-            # story
-            match = regex.search(r"\([0-9& ]+\)", panel)
-
-            if match:
-                result = match.group(0).strip("()")
-                panelapp_ids.extend(x.strip() for x in result.split("&"))
-            else:
-                raise Exception(
-                    f"'{panels}' hasn't been recognised as a panelapp panel"
-                )
-
-    return panelapp_ids
+    return df_res
