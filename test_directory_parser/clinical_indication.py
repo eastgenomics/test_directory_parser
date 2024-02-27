@@ -1,7 +1,7 @@
 import pandas as pd
 import regex
 
-from test_directory_parser import utils
+from .test_directory_parser import utils
 
 
 class ClinicalIndication:

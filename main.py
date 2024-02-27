@@ -1,7 +1,7 @@
 import argparse
 
-from test_directory_parser import utils
-from test_directory_parser import test_directory
+from .test_directory_parser import utils
+from .test_directory_parser import test_directory
 
 
 def main(args):
