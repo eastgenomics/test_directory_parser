@@ -46,7 +46,9 @@ The `ngs_test_methods` field contains the test methods that we want to keep, so 
     "clinical_indication_column_name": "Clinical Indication",
     "panel_column": "Target/Genes",
     "test_method_column": "Test Method",
+    "specialty_column": "Specialist test group",
     "header_index": 1,
+    "specialism_of_interest": ["Core", "Endocrinology", "Neurology"],
     "ngs_test_methods": [
         "Medium panel", "Single gene sequencing <=10 amplicons",
         "Single gene sequencing <10 amplicons",
