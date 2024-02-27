@@ -19,7 +19,7 @@ def parse_config(config: str):
     return config_data
 
 
-def parse_rare_disease_td(test_directory: str, config: str):
+def parse_rare_disease_td(test_directory: str, config: dict):
     """Parse rare disease test directory using the config file
 
     Args:
@@ -60,7 +60,15 @@ def parse_rare_disease_td(test_directory: str, config: str):
                 config["clinical_indication_column_name"],
                 config["panel_column"],
                 config["test_method_column"],
+                config["specialty_column"],
                 change_column
             ]
 
-    return data, change_column
+    # filter using the specialisms used in the lab
+    filtered_data = data.loc[
+        data[
+            config["specialty_column"]
+        ].isin(config["specialism_of_interest"])
+    ]
+
+    return filtered_data, change_column
