@@ -72,7 +72,7 @@ pip install -r requirements.txt
 
 ```bash
 # outputs a json containing cleaned data from the given test directory
-python main.py -c configs/${config} [-o ${output_path}] --hgnc ${hgnc_dump.txt} rare_disease ${test_directory.xslx} 
+python main.py -c configs/${config} [-o ${output_path}] --hgnc ${hgnc_dump.txt} rare_disease ${test_directory.xlsx} 
 ```
 
 ## Output
