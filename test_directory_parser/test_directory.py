@@ -3,9 +3,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from .test_directory_parser import clinical_indication
-from .test_directory_parser import rare_disease
-from .test_directory_parser import utils
+from test_directory_parser import clinical_indication
+from test_directory_parser import rare_disease
+from test_directory_parser import utils
 
 
 class TestDirectory:
