@@ -10,15 +10,23 @@ from test_directory_parser.utils import (
     get_date, parse_tsv, parse_lab_excel, find_hgnc_id
 )
 
+# path to the test folder containing all the data that will be used in the tests
 PATH_TO_TEST_FOLDER = Path(".") / "test_directory_parser" / "tests" / "test_data"
 
 class TestUtils(unittest.TestCase):
+    """ Suite of tests for the utils.py script """
+
     def test_get_date(self):
+        """ Test for the get_date function """
+
         expected_date = datetime.datetime.now().strftime("%y%m%d")
         test_date = get_date()
         self.assertEqual(expected_date, test_date)
 
     def test_parse_tsv(self):
+        """ Test for parse_tsv """
+
+        # path to the test tsv to be used in the test
         path_to_test_data = PATH_TO_TEST_FOLDER / "test.tsv"
         test_output = parse_tsv(path_to_test_data)
         expected_output = pd.DataFrame(
@@ -31,6 +39,9 @@ class TestUtils(unittest.TestCase):
 
     @patch("test_directory_parser.utils.pd.read_excel")
     def test_parse_lab_excel(self, mock_excel):
+        """ Test for the parse_lab_excel """
+
+        # define mock return value for read_excel
         mock_excel.return_value = pd.DataFrame(
             {
                 "Test": ["Test1", "Test2", "Test3", "Test4"],
@@ -47,6 +58,14 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(test_output.equals(expected_output))
 
     def test_find_hgnc_id(self):
+        """ Test for find_hgnc_id function. Will test 5 case scenarios 
+        - Straight forward gene symbol --> HGNC id found
+        - Ambiguous gene symbol --> HGNC id not found
+        - Alias gene symbol --> HGNC id found
+        - Previous gene symbol --> HGNC id found
+        - Unknown gene symbol --> HGNC id not found
+        """
+
         test_hgnc_dump = pd.DataFrame(
             {
                 "HGNC ID": [
@@ -75,6 +94,7 @@ class TestUtils(unittest.TestCase):
         )
 
         test_inputs = {
+            # Straight forward gene symbol
             "BRCA1": pd.Series(
                 {
                     "Gene symbol": "BRCA1",
@@ -83,6 +103,7 @@ class TestUtils(unittest.TestCase):
                     "Alias": None
                 }
             ),
+            # Ambiguous gene symbol
             "TAZ": pd.Series(
                 {
                     "Gene symbol": "TAZ",
@@ -91,6 +112,7 @@ class TestUtils(unittest.TestCase):
                     "Alias": True
                 }
             ),
+            # Alias gene symbol
             "HIP4": pd.Series(
                 {
                     "Gene symbol": "HIP4",
@@ -99,6 +121,7 @@ class TestUtils(unittest.TestCase):
                     "Alias": True
                 }
             ),
+            # Unknown gene symbol
             "Unknown": pd.Series(
                 {
                     "Gene symbol": "Unknown",
@@ -107,6 +130,7 @@ class TestUtils(unittest.TestCase):
                     "Alias": None
                 }
             ),
+            # Previous gene symbol
             "CCO": pd.Series(
                 {
                     "Gene symbol": "CCO",
