@@ -1,9 +1,10 @@
 import datetime
-import numpy as np
-import pandas as pd
 from pathlib import Path
 import unittest
 from unittest.mock import patch
+
+import numpy as np
+import pandas as pd
 
 from test_directory_parser.utils import (
     get_date, parse_tsv, parse_lab_excel, find_hgnc_id
@@ -81,7 +82,7 @@ class TestUtils(unittest.TestCase):
                     "Previous": None,
                     "Alias": None
                 }
-            ).T,
+            ),
             "TAZ": pd.Series(
                 {
                     "Gene symbol": "TAZ",
