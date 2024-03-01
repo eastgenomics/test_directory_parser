@@ -77,6 +77,12 @@ pip install -r requirements.txt
 python main.py -c configs/${config} [-o ${output_path}] --hgnc ${hgnc_dump.txt} rare_disease ${test_directory.xlsx} 
 ```
 
+## Run unittests
+
+```bash
+python -m unittest test_directory_parser.tests
+```
+
 ## Output
 
 The code will output a JSON file with the following default name `${YYMMDD}_RD_TD.json` with the following format:
