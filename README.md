@@ -5,14 +5,6 @@ These test directories have gone through a checking phase using https://github.c
 
 ## Before running the code
 
-### Linux packages
-
-The following linux package needs to be installed for the `mysqlclient` Python package to be installed:
-
-```bash
-sudo apt-get install libmysqlclient-dev
-```
-
 ### HGNC dump
 
 To generate the HGNC dump, you can go to: https://www.genenames.org/download/custom/
@@ -89,26 +81,33 @@ The code will output a JSON file with the following default name `${YYMMDD}_RD_T
 
 ```json
 {
-  "td_source": "",
-  "config_source": "",
-  "date": "",
+  "td_source": "name_of_td_file_used_at_runtime",
+  "config_source": "config_file_named_used",
+  "date": "date_at_runtime",
   "indications": [
     {
-      "name": "",
-      "code": "",
-      "gemini_name": "",
-      "test_method": "",
+      "name": "CI1",
+      "code": "R1.1",
+      "gemini_name": "R1.1_CI1_P",
+      "test_method": "test_method1",
       "panels": [
-        ""
+        "panelapp_id"
       ],
-      "original_targets": "",
-      "changes": ""
+      "original_targets": "Panel 1 (panelapp_id)",
+      "changes": "No changes"
     },
     {
-      .
-      .
-      .
-    }
+      "name": "CI2",
+      "code": "R2.1",
+      "gemini_name": "R2.1_CI2_P",
+      "test_method": "test_method2",
+      "panels": [
+        "HGNC_ID"
+      ],
+      "original_targets": "Gene symbol",
+      "changes": "No changes"
+    },
+  ]
 }
 ```
 
