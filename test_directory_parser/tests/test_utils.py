@@ -146,7 +146,3 @@ class TestUtils(unittest.TestCase):
 
             with self.subTest():
                 self.assertTrue(test_output.equals(expected_output))
-
-
-if __name__ == '__main__':
-    unittest.main()
