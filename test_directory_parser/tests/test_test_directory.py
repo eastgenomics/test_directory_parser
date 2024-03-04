@@ -56,6 +56,9 @@ class TestTestDirectory(unittest.TestCase):
         td.setup_clinical_indications()
         cls.td = td
 
+    def tearDown(self) -> None:
+        self.td.filtered_clinical_indications = []
+
     def test_setup_clinical_indications(self):
         # the clinical indications variables are lists containing clinical
         # indication objects and I don't have ways to compare those objects
@@ -81,8 +84,21 @@ class TestTestDirectory(unittest.TestCase):
         )
 
         self.td.filter_clinical_indications(test_internal_td)
-
         self.assertEqual(len(self.td.filtered_clinical_indications), 1)
 
     def test_filter_clinical_indications_absent(self):
-        pass
+        test_internal_td = pd.DataFrame(
+            {
+                "Clinical indication ID": ["R100", "R100"],
+                "Test ID": ["R100.1", "R100.2"],
+                "Clinical Indication": ["CI1", "CI2"],
+                "Target/Genes": ["Panel1", "Panel2"],
+                "Test Method": ["WES", "WES"],
+                "Commissioning category": ["Category1", "Category2"],
+                "Specialist test group": ["Core", "Core"],
+                "Changes since April 2023 publication": ["No change", "No change"]
+            }
+        )
+
+        with self.assertRaises(AssertionError):
+            self.td.filter_clinical_indications(test_internal_td)
