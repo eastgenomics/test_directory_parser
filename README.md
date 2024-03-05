@@ -5,14 +5,6 @@ These test directories have gone through a checking phase using https://github.c
 
 ## Before running the code
 
-### Linux packages
-
-The following linux package needs to be installed for the `mysqlclient` Python package to be installed:
-
-```bash
-sudo apt-get install libmysqlclient-dev
-```
-
 ### HGNC dump
 
 To generate the HGNC dump, you can go to: https://www.genenames.org/download/custom/
@@ -46,7 +38,9 @@ The `ngs_test_methods` field contains the test methods that we want to keep, so 
     "clinical_indication_column_name": "Clinical Indication",
     "panel_column": "Target/Genes",
     "test_method_column": "Test Method",
+    "specialty_column": "Specialist test group",
     "header_index": 1,
+    "specialism_of_interest": ["Core", "Endocrinology", "Neurology"],
     "ngs_test_methods": [
         "Medium panel", "Single gene sequencing <=10 amplicons",
         "Single gene sequencing <10 amplicons",
@@ -72,7 +66,15 @@ pip install -r requirements.txt
 
 ```bash
 # outputs a json containing cleaned data from the given test directory
-python main.py -c configs/${config} [-o ${output_path}] --hgnc ${hgnc_dump.txt} rare_disease ${test_directory.xslx} 
+python main.py -c configs/${config} [-o ${output_path}] --hgnc ${hgnc_dump.txt} rare_disease ${test_directory.xlsx} 
+```
+
+## Run unittests
+
+```bash
+python -m unittest test_directory_parser.tests
+# to suppress prints in the code
+python -m unittest -b test_directory_parser.tests
 ```
 
 ## Output
@@ -81,26 +83,33 @@ The code will output a JSON file with the following default name `${YYMMDD}_RD_T
 
 ```json
 {
-  "td_source": "",
-  "config_source": "",
-  "date": "",
+  "td_source": "name_of_td_file_used_at_runtime",
+  "config_source": "config_file_named_used",
+  "date": "date_at_runtime",
   "indications": [
     {
-      "name": "",
-      "code": "",
-      "gemini_name": "",
-      "test_method": "",
+      "name": "CI1",
+      "code": "R1.1",
+      "gemini_name": "R1.1_CI1_P",
+      "test_method": "test_method1",
       "panels": [
-        ""
+        "panelapp_id"
       ],
-      "original_targets": "",
-      "changes": ""
+      "original_targets": "Panel 1 (panelapp_id)",
+      "changes": "No changes"
     },
     {
-      .
-      .
-      .
-    }
+      "name": "CI2",
+      "code": "R2.1",
+      "gemini_name": "R2.1_CI2_P",
+      "test_method": "test_method2",
+      "panels": [
+        "HGNC_ID"
+      ],
+      "original_targets": "Gene symbol",
+      "changes": "No changes"
+    },
+  ]
 }
 ```
 

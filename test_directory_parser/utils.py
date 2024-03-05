@@ -1,35 +1,8 @@
 import datetime
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.sql.schema import MetaData
 import numpy as np
 import pandas as pd
 import regex
-
-
-def connect_to_local_database(user: str, passwd: str, db: str):
-    """ Return cursor of database
-    Args:
-        user (str): Username for the database
-        passwd (str): Password for the user
-        db (str): Database name to connect to
-    Returns:
-        tuple: SQLAlchemy session obj, SQLAlchemy meta obj
-    """
-
-    try:
-        db = create_engine(
-            f"mysql://{user}:{passwd}@127.0.0.1/{db}"
-        )
-    except Exception as e:
-        raise e
-    else:
-        meta = MetaData()
-        meta.reflect(bind=db)
-        Session = sessionmaker(bind=db)
-        session = Session()
-        return session, meta
 
 
 def get_date():
