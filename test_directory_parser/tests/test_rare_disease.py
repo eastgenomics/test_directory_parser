@@ -59,14 +59,14 @@ class TestRareDisease(unittest.TestCase):
         mock_td_excel.return_value = {
             "R&ID indications": pd.DataFrame(
                 {
-                    "Clinical indication ID": ["R100"],
-                    "Test ID": ["R100.1"],
-                    "Clinical Indication": ["CI1"],
-                    "Target/Genes": ["Panel1"],
-                    "Test Method": ["WES"],
-                    "Commissioning category": ["Category1"],
-                    "Specialist test group": ["Core"],
-                    "Changes since April 2023 publication": ["No change"]
+                    "Clinical indication ID": ["R100", "R300"],
+                    "Test ID": ["R100.1", "R300.1"],
+                    "Clinical Indication": ["CI1", "CI2"],
+                    "Target/Genes": ["Panel1", "Panel2"],
+                    "Test Method": ["WES", "WES"],
+                    "Commissioning category": ["Category1", "Category2"],
+                    "Specialist test group": ["Core", "Oncology"],
+                    "Changes since April 2023 publication": ["No change", "No change"]
                 }
             )
         }
