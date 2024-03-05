@@ -1,9 +1,14 @@
+import json
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 
 import pandas as pd
 
 from test_directory_parser.test_directory import TestDirectory
+from test_directory_parser.utils import get_date
+
+PATH_TO_TEST_FOLDER = Path(".") / "test_directory_parser" / "tests" / "test_data"
 
 class TestTestDirectory(unittest.TestCase):
     """ Test the methods of the test directory object """
@@ -50,7 +55,7 @@ class TestTestDirectory(unittest.TestCase):
             "Changes since April 2023 publication"
         )
 
-        td = TestDirectory("", "", "rare_disease", "")
+        td = TestDirectory("path/to/test_test_directory", "", "rare_disease", "")
         td.setup_clinical_indications()
         cls.td = td
 
@@ -137,3 +142,27 @@ class TestTestDirectory(unittest.TestCase):
 
         with self.assertRaises(AssertionError):
             self.td.filter_clinical_indications(test_internal_td)
+
+    def test_output_json(self):
+        expected_output = {
+            "td_source": "test_test_directory",
+            "config_source": "Test_config",
+            "date": get_date(),
+            "indications": [
+                {
+                "name": "CI1",
+                "code": "R100.1",
+                "gemini_name": "R100.1_CI1_P",
+                "test_method": "WES",
+                "panels": [],
+                "original_targets": "Panel1",
+                "changes": "No change"
+                }
+            ]
+        }
+
+        self.td.output_json(PATH_TO_TEST_FOLDER / "test_output.json")
+
+        with open(PATH_TO_TEST_FOLDER / "test_output.json") as f:
+            self.assertEqual(json.loads(f.read()), expected_output)
+            
