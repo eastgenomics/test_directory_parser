@@ -73,6 +73,8 @@ python main.py -c configs/${config} [-o ${output_path}] --hgnc ${hgnc_dump.txt} 
 
 ```bash
 python -m unittest test_directory_parser.tests
+# to suppress prints in the code
+python -m unittest -b test_directory_parser.tests
 ```
 
 ## Output
