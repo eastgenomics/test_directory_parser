@@ -23,6 +23,14 @@ class TestClinicalIndication(unittest.TestCase):
                 "Previous": None,
                 "Alias": None
             }
+        ),
+        pd.Series(
+            {
+                "Gene symbol": "BLARG",
+                "HGNC ID": None,
+                "Previous": None,
+                "Alias": None
+            }
         )
     ]
 
@@ -62,7 +70,7 @@ class TestClinicalIndication(unittest.TestCase):
             }
         )
         test_clinical_indication = ClinicalIndication(
-            "R100.1", "CI1", "BRCA1", "WES",
+            "R100.1", "CI1", "BRCA1", "gene",
             "Things have changed", ""
         )
 
@@ -78,15 +86,15 @@ class TestClinicalIndication(unittest.TestCase):
     def test_clean_target_multiple_genes(self, mock_hgnc_data):
         """ Test the clean_target method for multiple genes """
         test_clinical_indication = ClinicalIndication(
-            "R100.1", "CI1", "BRCA1, BRCA2", "WES",
+            "R100.1", "CI1", "BRCA1, BRCA2, BLARG", "WES",
             "Things have changed", ""
         )
 
         test_output = test_clinical_indication.genes
-        expected_output = ["HGNC:1100", "HGNC:1101"]
+        expected_output = ["HGNC:1100", "HGNC:1101", None]
 
         self.assertEqual(test_output, expected_output)
-        self.assertTrue(mock_hgnc_data.call_count, 2)
+        self.assertTrue(mock_hgnc_data.call_count, 3)
 
     def test_clean_target_mixin(self):
         """ Test the clean_target method for a mix of panels and genes """
