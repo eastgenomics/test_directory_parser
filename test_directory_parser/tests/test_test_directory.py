@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 import pandas as pd
 
+from test_directory_parser.clinical_indication import ClinicalIndication
 from test_directory_parser.test_directory import TestDirectory
 from test_directory_parser.utils import get_date
 
@@ -143,7 +144,17 @@ class TestTestDirectory(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.td.filter_clinical_indications(test_internal_td)
 
-    def test_output_json(self):
+    def test_output_json_no_internal_td(self):
+        """ Test output json method
+        
+        Test setup:
+        - TD object contains only R100.1
+        - No internal TD filtered
+
+        Expectation:
+        - Output JSON should contain data only for R100.1
+        """
+
         expected_output = {
             "td_source": "test_test_directory",
             "config_source": "Test_config",
@@ -157,6 +168,57 @@ class TestTestDirectory(unittest.TestCase):
                 "panels": [],
                 "original_targets": "Panel1",
                 "changes": "No change"
+                }
+            ]
+        }
+
+        self.td.output_json(PATH_TO_TEST_FOLDER / "test_output.json")
+
+        with open(PATH_TO_TEST_FOLDER / "test_output.json") as f:
+            self.assertEqual(json.loads(f.read()), expected_output)
+            
+
+    @patch("test_directory_parser.utils.find_hgnc_id")
+    def test_output_json_with_internal_td(self, mock_hgnc_id):
+        """ Test output json method
+        
+        Test setup:
+        - TD object contains only R100.1
+        - No internal TD filtered
+
+        Expectation:
+        - Output JSON should contain data only for R100.1
+        """
+
+        # mock in a return value so that the gene symbol is not identified
+        mock_hgnc_id.return_value = pd.Series(
+            {
+                "HGNC ID": None
+            }
+        )
+
+        # create dummy clinical indication with unknown gene symbol
+        test_ci = ClinicalIndication(
+            "R5.1", "Unknown gene CI", "BLARG", "Single gene panel", "", ""
+        )
+
+        # bypass filtering of clinical indications by assigning to the
+        # attribute directly 
+        self.td.filtered_clinical_indications = [test_ci]
+
+        expected_output = {
+            "td_source": "test_test_directory",
+            "config_source": "Test_config",
+            "date": get_date(),
+            "indications": [
+                {
+                "name": "Unknown gene CI",
+                "code": "R5.1",
+                "gemini_name": "R5.1_Unknown gene CI_G",
+                "test_method": "Single gene panel",
+                "panels": [None],
+                "original_targets": "BLARG",
+                "changes": ""
                 }
             ]
         }
