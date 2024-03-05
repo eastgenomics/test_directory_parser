@@ -78,17 +78,17 @@ class TestUtils(unittest.TestCase):
                 ],
                 "Status": [
                     "Approved", "Approved", "Approved", "Approved", "Approved",
-                    "Approved", "Approved", 
+                    "Approved", "Approved"
                 ],
                 "Previous symbols": [
-                    "", "", "", "MHS, MHS1, CCO", "CMD3A, EFE2, EFE, TAZ", "",
-                    "ZNF238"
+                    "MULTIPLE_PREVIOUS", "MULTIPLE_PREVIOUS", "",
+                    "MHS, MHS1, CCO", "CMD3A, EFE2, EFE, TAZ", "", "ZNF238", 
                 ],
                 "Alias symbols": [
                     "RNF53, BRCC1, PPP1R53, FANCS",
                     "LBRCA1, PsiBRCA1, pseudo-BRCA1", "HIP4", "RYR, PPP1R137",
-                    "BTHS, G4.5, TAZ1", "TAZ, DKFZp586I1419",
-                    "C2H2-171, TAZ-1, RP58", 
+                    "BTHS, G4.5, MULTIPLE_ALIAS", "TAZ, DKFZp586I1419",
+                    "C2H2-171, MULTIPLE_ALIAS, RP58", 
                 ]
             }
         )
@@ -122,9 +122,9 @@ class TestUtils(unittest.TestCase):
                 }
             ),
             # Unknown gene symbol
-            "Unknown": pd.Series(
+            "UNKNOWN": pd.Series(
                 {
-                    "Gene symbol": "Unknown",
+                    "Gene symbol": "UNKNOWN",
                     "HGNC ID": None,
                     "Previous": None,
                     "Alias": None
@@ -139,10 +139,31 @@ class TestUtils(unittest.TestCase):
                     "Alias": False
                 }
             ),
+            # Multiple previous gene symbol
+            "MULTIPLE_PREVIOUS": pd.Series(
+                {
+                    "Gene symbol": "MULTIPLE_PREVIOUS",
+                    "HGNC ID": None,
+                    "Previous": True,
+                    "Alias": False
+                }
+            ),
+            # Multiple alias gene symbol
+            "MULTIPLE_ALIAS": pd.Series(
+                {
+                    "Gene symbol": "MULTIPLE_ALIAS",
+                    "HGNC ID": None,
+                    "Previous": False,
+                    "Alias": True
+                }
+            ),
         }
 
         for test_input, expected_output in test_inputs.items():
             test_output = find_hgnc_id(test_input, test_hgnc_dump)
+            test_msg = (
+                f"Unexpected output: {test_output.to_dict()} vs {expected_output.to_dict()}"
+            )
 
-            with self.subTest():
+            with self.subTest(test_msg):
                 self.assertTrue(test_output.equals(expected_output))
