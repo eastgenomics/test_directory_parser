@@ -31,44 +31,44 @@ def parse_rare_disease_td(test_directory: str, config: dict):
     """
 
     xls = pd.read_excel(
-        test_directory, sheet_name=None, header=config["header_index"]
+        test_directory,
+        sheet_name=config["sheet_of_interest"],
+        header=config["header_index"]
     )
 
-    for sheet in xls:
-        if sheet == config["sheet_of_interest"]:
-            # find name of change column
-            change_column = [
-                col for col in xls[sheet].columns
-                if config['changes_column'].lower() in col.lower()
-            ]
+    # find name of change column
+    change_column = [
+        col for col in xls.columns
+        if config['changes_column'].lower() in col.lower()
+    ]
 
-            if change_column:
-                if len(change_column) == 1:
-                    change_column = change_column[0]
-                else:
-                    raise Exception((
-                        "2 or more columns were detected as having "
-                        f"'{config['changes_column']}' "
-                        "in their name breaking the changes gathering.\n"
-                        f"Matched column names: {';'.join(change_column)}"
-                    ))
-            else:
-                raise Exception("Couldn't find the change column.")
+    if change_column:
+        if len(change_column) == 1:
+            change_column = change_column[0]
+        else:
+            raise Exception((
+                "2 or more columns were detected as having "
+                f"'{config['changes_column']}' "
+                "in their name breaking the changes gathering.\n"
+                f"Matched column names: {';'.join(change_column)}"
+            ))
+    else:
+        raise Exception("Couldn't find the change column.")
 
-            data = xls[sheet].loc(axis=1)[
-                config["clinical_indication_column_code"],
-                config["clinical_indication_column_name"],
-                config["panel_column"],
-                config["test_method_column"],
-                config["specialty_column"],
-                change_column
-            ]
+    data = xls.loc(axis=1)[
+        config["clinical_indication_column_code"],
+        config["clinical_indication_column_name"],
+        config["panel_column"],
+        config["test_method_column"],
+        config["ngs_column"],
+        change_column
+    ]
 
-    # filter using the specialisms used in the lab
+    # # filter using the NGS tests used in the lab
     filtered_data = data.loc[
         data[
-            config["specialty_column"]
-        ].isin(config["specialism_of_interest"])
+            config["ngs_column"]
+        ].isin(config["ngs_type"])
     ]
 
     return filtered_data, change_column
