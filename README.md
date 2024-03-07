@@ -18,9 +18,7 @@ And for the code to work, the following checkboxes need to be checked when you d
 
 ### Test directory
 
-The rare disease and cancer test directories are downloadable here: https://www.england.nhs.uk/publication/national-genomic-test-directories/
-
-Right now this version of the code can only be used to parse the rare disease test directory.
+From v1.4.0, the test directory needs to contain the `NGS Technology` column which should be present in the internal test directory obtainable here: https://future.nhs.uk/EMEEGL/view?objectID=164193093
 
 ### Config file
 
