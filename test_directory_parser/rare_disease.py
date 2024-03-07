@@ -64,7 +64,7 @@ def parse_rare_disease_td(test_directory: str, config: dict):
         change_column
     ]
 
-    # # filter using the NGS tests used in the lab
+    # filter using the NGS tests used in the lab
     filtered_data = data.loc[
         data[
             config["ngs_column"]
