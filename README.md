@@ -26,7 +26,7 @@ The config file is used to indicate the header line, the name of the sheet of in
 
 Right now the columns containing the test code, clinical indication name, test methods and the targets columns are processed without addition of code.
 
-The code filters for the clinical indications that have values present the `ngs_type` and `ngs_test_methods` fields.
+The code filters for the clinical indications that have values present in the `ngs_type` and `ngs_test_methods` fields.
 
 ```json
 {
