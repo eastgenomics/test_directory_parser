@@ -18,7 +18,7 @@ And for the code to work, the following checkboxes need to be checked when you d
 
 ### Test directory
 
-From v1.4.0, the test directory needs to contain the `NGS Technology` column which should be present in the internal test directory obtainable here: https://future.nhs.uk/EMEEGL/view?objectID=164193093
+From v1.4.0, the test directory needs to contain a `NGS Technology` column which should be present in the internal test directory obtainable here: https://future.nhs.uk/EMEEGL/view?objectID=164193093
 
 ### Config file
 
@@ -26,7 +26,7 @@ The config file is used to indicate the header line, the name of the sheet of in
 
 Right now the columns containing the test code, clinical indication name, test methods and the targets columns are processed without addition of code.
 
-The `ngs_test_methods` field contains the test methods that we want to keep, so filtering will be applied on the test method using this list
+The code filters for the clinical indications that have values present the `ngs_type` and `ngs_test_methods` fields.
 
 ```json
 {
@@ -36,9 +36,9 @@ The `ngs_test_methods` field contains the test methods that we want to keep, so 
     "clinical_indication_column_name": "Clinical Indication",
     "panel_column": "Target/Genes",
     "test_method_column": "Test Method",
-    "specialty_column": "Specialist test group",
+    "ngs_column": "NGS Technology",
     "header_index": 1,
-    "specialism_of_interest": ["Core", "Endocrinology", "Neurology"],
+    "ngs_type": ["WES", "CEN"],
     "ngs_test_methods": [
         "Medium panel", "Single gene sequencing <=10 amplicons",
         "Single gene sequencing <10 amplicons",
