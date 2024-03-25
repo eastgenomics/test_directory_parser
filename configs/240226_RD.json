@@ -1,13 +1,13 @@
 {
     "name": "240226_RD",
-    "sheet_of_interest": "Sheet1",
+    "sheet_of_interest": "R&ID indications",
     "clinical_indication_column_code": "Test ID",
     "clinical_indication_column_name": "Clinical Indication",
     "panel_column": "Target/Genes",
     "test_method_column": "Test Method",
     "changes_column": "Changes",
-    "ngs_column": "NGS Technology",
-    "header_index": 0,
+    "ngs_column": "Technology",
+    "header_index": 1,
     "ngs_type": ["WES", "CEN"],
     "ngs_test_methods": [
         "Medium panel", "Single gene sequencing <=10 amplicons",
@@ -16,6 +16,7 @@
         "Single gene testing (<10 amplicons)", "small panel", "Small panel",
         "WES or Large panel", "WES or Large Panel", "WES or Medium Panel",
         "WES or Large penel", "WES or Medium panel", "WES or Small Panel",
-        "WGS", "WES", "Exon level CNV detection by MLPA or equivalent"
+        "WGS", "WES", "Exon level CNV detection by MLPA or equivalent",
+        "Small panel - deep sequencing", "Small panel ", "MLPA or equivalent"
     ]
 }
